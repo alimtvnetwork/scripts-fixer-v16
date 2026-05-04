@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # --------------------------------------------------------------------------
 #  fix-legacy-fixer-refs.sh
-#  One-command auto-fix: rewrites scripts-fixer-v14/v9/v10 -> scripts-fixer-v14
+#  One-command auto-fix: rewrites scripts-fixer-v15/v9/v10 -> scripts-fixer-v15
 #  across every text file in the repo (including lockfiles).
 #
 #  Usage:
