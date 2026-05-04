@@ -188,7 +188,11 @@ function Find-BestDevDrive {
 function Get-DevDriveCacheFile {
     # Repo root = parent of scripts/ which is parent of scripts/shared/
     $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-    return Join-Path $repoRoot ".dev-drive-cache.json"
+    $cacheDir = Join-Path $repoRoot ".resolved"
+    if (-not (Test-Path $cacheDir)) {
+        New-Item -Path $cacheDir -ItemType Directory -Force -Confirm:$false | Out-Null
+    }
+    return Join-Path $cacheDir "dev-drive-cache.json"
 }
 
 function Get-CachedDevDir {
