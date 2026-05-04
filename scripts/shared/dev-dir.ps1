@@ -141,15 +141,15 @@ function Find-BestDevDrive {
     $slm = $script:SharedLogMessages
     Write-Log $slm.messages.driveAutoDetecting -Level "info"
 
-    # Priority 1: E: drive
-    $isEQualified = Test-DriveQualified -DriveLetter "E"
+    # Priority 1: E: drive (preferred default -- speculative probe, silent fallback)
+    $isEQualified = Test-DriveQualified -DriveLetter "E" -Speculative
     if ($isEQualified) {
         Write-Log ($slm.messages.drivePreferred -replace '\{drive\}', "E:") -Level "success"
         return "E"
     }
 
-    # Priority 2: D: drive
-    $isDQualified = Test-DriveQualified -DriveLetter "D"
+    # Priority 2: D: drive (preferred default -- speculative probe, silent fallback)
+    $isDQualified = Test-DriveQualified -DriveLetter "D" -Speculative
     if ($isDQualified) {
         Write-Log ($slm.messages.drivePreferred -replace '\{drive\}', "D:") -Level "success"
         return "D"
