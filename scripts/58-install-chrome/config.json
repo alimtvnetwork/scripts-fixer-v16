@@ -1,0 +1,44 @@
+{
+  "devDir": {
+    "mode": "smart",
+    "default": "auto",
+    "override": ""
+  },
+  "chrome": {
+    "enabled": true,
+    "chocoPackage": "googlechrome",
+    "name": "Google Chrome",
+    "desc": "Google Chrome browser (installed via Chocolatey, falls back to official standalone installer)",
+    "skipDevDirPrompt": true,
+    "fallback": {
+      "enabled": true,
+      "url": "https://dl.google.com/chrome/install/standalonesetup64.exe",
+      "fileName": "ChromeStandaloneSetup64.exe",
+      "downloadDir": "",
+      "silentArgs": "/silent /install",
+      "timeoutSeconds": 600
+    },
+    "uninstallCleanup": {
+      "enabled": true,
+      "removeRegistryKeys": true,
+      "removeShortcuts": true,
+      "registryKeys": [
+        "HKCU:\\Software\\Google\\Chrome",
+        "HKLM:\\SOFTWARE\\Google\\Chrome",
+        "HKLM:\\SOFTWARE\\WOW6432Node\\Google\\Chrome",
+        "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome",
+        "HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome"
+      ],
+      "shortcutPaths": [
+        "%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Google Chrome.lnk",
+        "%PROGRAMDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Google Chrome.lnk",
+        "%USERPROFILE%\\Desktop\\Google Chrome.lnk",
+        "%PUBLIC%\\Desktop\\Google Chrome.lnk"
+      ],
+      "appDataPaths": [
+        "%LOCALAPPDATA%\\Google\\Chrome"
+      ],
+      "purgeAppData": false
+    }
+  }
+}
