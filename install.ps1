@@ -271,12 +271,77 @@
         Write-Host ""
     }
 
-    # ----- Check git is available ------------------------------------------
-    $hasGit = Get-Command git -ErrorAction SilentlyContinue
-    if (-not $hasGit) {
-        Write-Host "  [ERROR] git is not installed. Install Git first, then re-run." -ForegroundColor Red
-        Write-Host "          winget install Git.Git" -ForegroundColor DarkGray
-        return
+    # ----- Ensure git is available (auto-install if missing) ---------------
+    function Test-GitAvailable {
+        $cmd = Get-Command git -ErrorAction SilentlyContinue
+        if ($cmd) { return $true }
+        # Refresh PATH from machine + user (in case it was just installed)
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+        $cmd = Get-Command git -ErrorAction SilentlyContinue
+        if ($cmd) { return $true }
+        # Probe well-known install locations
+        $probes = @(
+            "$env:ProgramFiles\Git\cmd\git.exe",
+            "${env:ProgramFiles(x86)}\Git\cmd\git.exe",
+            "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe"
+        )
+        foreach ($p in $probes) {
+            if ($p -and (Test-Path $p)) {
+                $env:Path = (Split-Path $p) + ";" + $env:Path
+                return $true
+            }
+        }
+        return $false
+    }
+
+    if (-not (Test-GitAvailable)) {
+        Write-Host "  [GIT] Git not found. Attempting auto-install..." -ForegroundColor Yellow
+
+        $hasWinget = Get-Command winget -ErrorAction SilentlyContinue
+        $hasChoco  = Get-Command choco  -ErrorAction SilentlyContinue
+        $installed = $false
+
+        if ($hasWinget) {
+            Write-Host "  [GIT] Installing Git via winget (Git.Git)..." -ForegroundColor Cyan
+            try {
+                & winget install --id Git.Git -e --silent --accept-source-agreements --accept-package-agreements
+                if ($LASTEXITCODE -eq 0) { $installed = $true }
+            } catch { Write-Host "  [WARN] winget install failed: $_" -ForegroundColor Yellow }
+        }
+
+        if (-not $installed -and $hasChoco) {
+            Write-Host "  [GIT] Installing Git via Chocolatey (choco install git)..." -ForegroundColor Cyan
+            try {
+                & choco install git -y --no-progress
+                if ($LASTEXITCODE -eq 0) { $installed = $true }
+            } catch { Write-Host "  [WARN] choco install failed: $_" -ForegroundColor Yellow }
+        }
+
+        if (-not $installed -and -not $hasWinget -and -not $hasChoco) {
+            Write-Host "  [GIT] Neither winget nor Chocolatey found. Bootstrapping Chocolatey first..." -ForegroundColor Cyan
+            try {
+                Set-ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue
+                [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+                $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+                if (Get-Command choco -ErrorAction SilentlyContinue) {
+                    Write-Host "  [GIT] Installing Git via Chocolatey..." -ForegroundColor Cyan
+                    & choco install git -y --no-progress
+                    if ($LASTEXITCODE -eq 0) { $installed = $true }
+                }
+            } catch { Write-Host "  [WARN] Chocolatey bootstrap failed: $_" -ForegroundColor Yellow }
+        }
+
+        if ($installed -and (Test-GitAvailable)) {
+            Write-Host "  [OK] Git installed successfully: $(& git --version)" -ForegroundColor Green
+        } else {
+            Write-Host "  [ERROR] Could not auto-install Git. Please install it manually and re-run." -ForegroundColor Red
+            Write-Host "          Options:" -ForegroundColor DarkGray
+            Write-Host "            winget install --id Git.Git -e" -ForegroundColor DarkGray
+            Write-Host "            choco install git -y" -ForegroundColor DarkGray
+            Write-Host "            Or download: https://git-scm.com/download/win" -ForegroundColor DarkGray
+            return
+        }
     }
 
     # ----- Helper: invoke git cleanly (silences stderr-as-error noise) -----
