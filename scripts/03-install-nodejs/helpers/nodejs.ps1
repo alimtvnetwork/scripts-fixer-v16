@@ -357,8 +357,27 @@ function Install-NodeExtras {
                 Save-InstalledRecord -Name "yarn" -Version $yarnVersion -Method "npm"
             }
             catch {
-                Write-Log ($LogMessages.messages.yarnInstallFailed -replace '\{error\}', $_) -Level "error"
-                Save-InstalledError -Name "yarn" -ErrorMessage "$_" -Method "npm"
+                # Yarn is an OPTIONAL extra. A transient network failure (e.g. npm registry
+                # unreachable, proxy, DNS) must NOT flip the whole script to overallStatus=fail.
+                # Detect network-class failures and downgrade to a warning with a retry hint;
+                # only true non-network failures stay as errors.
+                $errText = "$_"
+                $isNetworkError = ($errText -match 'network') -or `
+                                  ($errText -match 'ENOTFOUND') -or `
+                                  ($errText -match 'ETIMEDOUT') -or `
+                                  ($errText -match 'ECONNRESET') -or `
+                                  ($errText -match 'ECONNREFUSED') -or `
+                                  ($errText -match 'EAI_AGAIN') -or `
+                                  ($errText -match 'proxy') -or `
+                                  ($errText -match 'registry\.npmjs\.org.*failed')
+                if ($isNetworkError) {
+                    Write-Log "Yarn (optional extra) skipped due to network error reaching npm registry. This is NOT a script failure -- Node.js itself installed fine. Retry later with: npm install -g yarn" -Level "warn"
+                    Write-Log "Underlying npm error: $errText" -Level "warn"
+                    Save-InstalledError -Name "yarn" -ErrorMessage "network: $errText" -Method "npm"
+                } else {
+                    Write-Log ($LogMessages.messages.yarnInstallFailed -replace '\{error\}', $_) -Level "error"
+                    Save-InstalledError -Name "yarn" -ErrorMessage "$_" -Method "npm"
+                }
             }
         }
     }
