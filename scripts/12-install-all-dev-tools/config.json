@@ -72,7 +72,8 @@
     "44": { "enabled": true, "folder": "44-install-rust",              "name": "Rust",                 "desc": "Install Rust via rustup, configure cargo" },
     "45": { "enabled": true, "folder": "45-install-docker",            "name": "Docker Desktop",       "desc": "Install Docker Desktop, enable WSL2 backend" },
     "46": { "enabled": true, "folder": "46-install-kubernetes",        "name": "Kubernetes Tools",     "desc": "Install kubectl, minikube, Helm, k9s" },
-    "48": { "enabled": true, "folder": "48-install-conemu",            "name": "ConEmu + Settings",    "desc": "Install ConEmu console emulator and sync ConEmu.xml settings" }
+    "48": { "enabled": true, "folder": "48-install-conemu",            "name": "ConEmu + Settings",    "desc": "Install ConEmu console emulator and sync ConEmu.xml settings" },
+    "58": { "enabled": true, "folder": "58-install-chrome",            "name": "Google Chrome",        "desc": "Install Google Chrome browser via Chocolatey (with official installer fallback)" }
   },
-  "sequence": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "48"]
+  "sequence": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "48", "58"]
 }
