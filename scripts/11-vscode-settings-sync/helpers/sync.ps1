@@ -311,7 +311,151 @@ function Invoke-Edition {
         Write-Log ($LogMessages.messages.keybindingsPresent -replace '\{path\}', $destKeybindings) -Level "success"
     }
 
+    # -- Deep post-install validation (JSON parse + extension cross-check) --
+    $validateOk = Test-VsCodeSettingsApplied `
+        -EditionLabel    $EditionName `
+        -SettingsDir     $settingsDir `
+        -SettingsPath    $destSettings `
+        -KeybindingsPath $destKeybindings `
+        -ExpectedExtensions $Sources.Extensions `
+        -CliCommand      $cliCmd `
+        -LogMessages     $LogMessages
+    if (-not $validateOk) { $isAllOk = $false }
+
     return $isAllOk
+}
+
+function Test-VsCodeSettingsApplied {
+    <#
+    .SYNOPSIS
+        Deep post-install validation for VS Code settings sync. Verifies:
+          1. settings.json exists, is non-empty, parses as valid JSON, key count > 0
+          2. keybindings.json (if expected) exists, parses as JSON array
+          3. Each expected extension appears in `code --list-extensions`
+        Emits a single bracketed summary line so humans can spot pass/fail
+        at a glance, plus per-check error logs that satisfy the CODE RED rule
+        (file path + reason on every failure).
+    #>
+    param(
+        [Parameter(Mandatory)] [string]$EditionLabel,
+        [Parameter(Mandatory)] [string]$SettingsDir,
+        [Parameter(Mandatory)] [string]$SettingsPath,
+        [string]$KeybindingsPath,
+        [string[]]$ExpectedExtensions,
+        [Parameter(Mandatory)] [string]$CliCommand,
+        [Parameter(Mandatory)] $LogMessages
+    )
+    $msgs = $LogMessages.messages
+    $startMsg = $msgs.validateStart -replace '\{label\}', $EditionLabel
+    $startMsg = $startMsg -replace '\{dir\}', $SettingsDir
+    Write-Log $startMsg -Level "info"
+
+    $settingsOk = $false; $keybindingsOk = $true; $extOk = $true
+    $extInstalled = 0; $extExpected = 0
+    if ($ExpectedExtensions) { $extExpected = $ExpectedExtensions.Count }
+
+    # -- settings.json ----------------------------------------------------
+    if (Test-Path -LiteralPath $SettingsPath) {
+        $bytes = 0
+        try { $bytes = (Get-Item -LiteralPath $SettingsPath).Length } catch { }
+        if ($bytes -le 0) {
+            $m = $msgs.validateEmptyJson -replace '\{file\}', "settings.json"
+            $m = $m -replace '\{path\}', $SettingsPath
+            Write-FileError -FilePath $SettingsPath -Operation "validate" -Reason "settings.json is 0 bytes" -Module "Test-VsCodeSettingsApplied"
+            Write-Log $m -Level "error"
+        } else {
+            try {
+                $raw = Get-Content -LiteralPath $SettingsPath -Raw -ErrorAction Stop
+                $obj = $raw | ConvertFrom-Json -ErrorAction Stop
+                $keyCount = @($obj.PSObject.Properties).Count
+                $okMsg = $msgs.validateOkSettings -replace '\{bytes\}', $bytes
+                $okMsg = $okMsg -replace '\{keys\}', $keyCount
+                $okMsg = $okMsg -replace '\{path\}', $SettingsPath
+                Write-Log $okMsg -Level "success"
+                $settingsOk = $true
+            } catch {
+                $m = $msgs.validateBadJson -replace '\{file\}', "settings.json"
+                $m = $m -replace '\{path\}', $SettingsPath
+                $m = $m -replace '\{error\}', $_.Exception.Message
+                Write-FileError -FilePath $SettingsPath -Operation "validate" -Reason "JSON parse failed: $($_.Exception.Message)" -Module "Test-VsCodeSettingsApplied"
+                Write-Log $m -Level "error"
+            }
+        }
+    } else {
+        Write-FileError -FilePath $SettingsPath -Operation "validate" -Reason "settings.json not present after apply" -Module "Test-VsCodeSettingsApplied"
+    }
+
+    # -- keybindings.json (only if a source was provided) ------------------
+    $hasKbExpected = -not [string]::IsNullOrWhiteSpace($KeybindingsPath)
+    if ($hasKbExpected -and (Test-Path -LiteralPath $KeybindingsPath)) {
+        $kbBytes = 0
+        try { $kbBytes = (Get-Item -LiteralPath $KeybindingsPath).Length } catch { }
+        if ($kbBytes -le 0) {
+            $m = $msgs.validateEmptyJson -replace '\{file\}', "keybindings.json"
+            $m = $m -replace '\{path\}', $KeybindingsPath
+            Write-FileError -FilePath $KeybindingsPath -Operation "validate" -Reason "keybindings.json is 0 bytes" -Module "Test-VsCodeSettingsApplied"
+            Write-Log $m -Level "error"
+            $keybindingsOk = $false
+        } else {
+            try {
+                $kbRaw = Get-Content -LiteralPath $KeybindingsPath -Raw -ErrorAction Stop
+                $kbArr = $kbRaw | ConvertFrom-Json -ErrorAction Stop
+                $kbCount = @($kbArr).Count
+                $okMsg = $msgs.validateOkKeybindings -replace '\{bytes\}', $kbBytes
+                $okMsg = $okMsg -replace '\{entries\}', $kbCount
+                $okMsg = $okMsg -replace '\{path\}', $KeybindingsPath
+                Write-Log $okMsg -Level "success"
+            } catch {
+                $m = $msgs.validateBadJson -replace '\{file\}', "keybindings.json"
+                $m = $m -replace '\{path\}', $KeybindingsPath
+                $m = $m -replace '\{error\}', $_.Exception.Message
+                Write-FileError -FilePath $KeybindingsPath -Operation "validate" -Reason "JSON parse failed: $($_.Exception.Message)" -Module "Test-VsCodeSettingsApplied"
+                Write-Log $m -Level "error"
+                $keybindingsOk = $false
+            }
+        }
+    }
+
+    # -- extensions cross-check (against `code --list-extensions`) ---------
+    if ($extExpected -gt 0) {
+        try {
+            $listed = & $CliCommand --list-extensions 2>$null
+            $listedSet = @{}
+            foreach ($e in $listed) {
+                $key = ([string]$e).Trim().ToLowerInvariant()
+                if ($key) { $listedSet[$key] = $true }
+            }
+            foreach ($ext in $ExpectedExtensions) {
+                $key = ([string]$ext).Trim().ToLowerInvariant()
+                if ($listedSet.ContainsKey($key)) {
+                    $extInstalled++
+                } else {
+                    Write-Log ($msgs.validateExtMissing -replace '\{ext\}', $ext) -Level "warn"
+                }
+            }
+            $extMsg = $msgs.validateExtensions -replace '\{installed\}', $extInstalled
+            $extMsg = $extMsg -replace '\{expected\}', $extExpected
+            Write-Log $extMsg -Level $(if ($extInstalled -eq $extExpected) { "success" } else { "warn" })
+            if ($extInstalled -lt $extExpected) { $extOk = $false }
+        } catch {
+            Write-Log "Extension cross-check failed (cli=$CliCommand): $($_.Exception.Message)" -Level "warn"
+            $extOk = $false
+        }
+    }
+
+    # -- summary line ------------------------------------------------------
+    $summary = $msgs.validateSummary
+    $summary = $summary -replace '\{label\}',         $EditionLabel
+    $summary = $summary -replace '\{settingsOk\}',    $(if ($settingsOk)    { "PASS" } else { "FAIL" })
+    $summary = $summary -replace '\{keybindingsOk\}', $(if ($keybindingsOk) { "PASS" } else { "FAIL" })
+    $summary = $summary -replace '\{extOk\}',         $(if ($extOk)         { "PASS" } else { "WARN" })
+    $summary = $summary -replace '\{extInstalled\}',  $extInstalled
+    $summary = $summary -replace '\{extExpected\}',   $extExpected
+    $summary = $summary -replace '\{dir\}',           $SettingsDir
+    $isAllPass = $settingsOk -and $keybindingsOk
+    Write-Log $summary -Level $(if ($isAllPass -and $extOk) { "success" } else { if ($isAllPass) { "warn" } else { "error" } })
+
+    return $isAllPass
 }
 
 function Export-VsCodeSettings {
