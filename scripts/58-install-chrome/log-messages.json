@@ -1,0 +1,53 @@
+{
+  "scriptName": "install-chrome",
+  "scriptTitle": "Install Google Chrome",
+  "scriptDesc": "Install Google Chrome browser via Chocolatey, with official standalone installer fallback",
+  "messages": {
+    "checking": "Checking for existing Google Chrome install...",
+    "alreadyInstalled": "Google Chrome already installed at: {path}",
+    "notFound": "Google Chrome not found -- will install via Chocolatey",
+    "installing": "Installing googlechrome via Chocolatey...",
+    "installSuccess": "Google Chrome installed at: {path}",
+    "installFailed": "Google Chrome installation failed: {error}",
+    "verifyFailed": "Install completed but chrome.exe was not found in any expected location -- choco package may have changed install path",
+    "fallbackTriggered": "Chocolatey path failed -- falling back to official Chrome standalone installer ({reason})",
+    "fallbackDisabled": "Fallback disabled in config -- aborting after Chocolatey failure",
+    "fallbackDownloading": "Downloading official installer from {url} -> {dest}",
+    "fallbackDownloadOk": "Downloaded {bytes} bytes to {dest}",
+    "fallbackDownloadFailed": "Download failed from {url}: {error}",
+    "fallbackRunning": "Running official installer silently: {path} {args}",
+    "fallbackInstallerExited": "Official installer exited with code {code} after {seconds}s",
+    "fallbackInstallerFailed": "Official installer failed: {error}",
+    "fallbackVerifyFailed": "Official installer ran but chrome.exe still not found in expected locations",
+    "fallbackSuccess": "Google Chrome installed via official installer at: {path}",
+    "setupComplete": "Google Chrome setup complete",
+    "uninstalling": "Uninstalling {name}...",
+    "uninstallSuccess": "{name} uninstalled successfully.",
+    "uninstallFailed": "{name} uninstall failed -- package may need manual removal.",
+    "cleanupSkipped": "Post-uninstall cleanup disabled in config -- skipping registry + shortcut sweep",
+    "cleanupStart": "Sweeping leftover Chrome registry keys + shortcuts...",
+    "cleanupRegKeyRemoved": "Removed registry key: {path}",
+    "cleanupRegKeyMissing": "Registry key not present (clean): {path}",
+    "cleanupRegKeyFailed": "Could not remove registry key {path}: {error}",
+    "cleanupShortcutRemoved": "Removed shortcut/folder: {path}",
+    "cleanupShortcutMissing": "Shortcut not present (clean): {path}",
+    "cleanupShortcutFailed": "Could not remove shortcut {path}: {error}",
+    "cleanupAppDataKept": "AppData kept (purgeAppData=false): {path}",
+    "cleanupAppDataPurged": "Purged AppData folder: {path}",
+    "cleanupSummary": "Cleanup summary -- registry: {regRemoved} removed / {regMissing} clean / {regFailed} failed; shortcuts: {scRemoved} removed / {scMissing} clean / {scFailed} failed",
+    "uninstallComplete": "Uninstall complete. Package removed, tracking purged."
+  },
+  "help": {
+    "commands": {
+      "install": "Install Google Chrome via Chocolatey (default)",
+      "uninstall": "Uninstall Google Chrome, remove tracking"
+    },
+    "examples": [
+      ".\\run.ps1 install chrome",
+      ".\\run.ps1 install google-chrome",
+      ".\\run.ps1 -I 58",
+      ".\\run.ps1 -I 58 -- -Help",
+      ".\\run.ps1 -I 58 uninstall"
+    ]
+  }
+}
