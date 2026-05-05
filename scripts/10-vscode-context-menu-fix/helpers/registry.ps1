@@ -289,7 +289,7 @@ function Invoke-Edition {
 
     $isExeMissing = -not $VsCodeExe
     if ($isExeMissing) {
-        Write-Log ($logMsgs.messages.exeNotFound -replace '\{label\}', $Edition.contextMenuLabel) -Level "warn"
+        Write-Log ($logMsgs.messages.exeNotFound -replace '\{label\}', $editionLabel) -Level "warn"
         return $false
     }
     Write-Log ($logMsgs.messages.usingExe -replace '\{path\}', $VsCodeExe) -Level "success"
@@ -299,7 +299,7 @@ function Invoke-Edition {
         Save-ResolvedPath -ScriptDir $ScriptDir -EditionName $EditionName -ResolvedExe $VsCodeExe
     }
 
-    $Label   = $Edition.contextMenuLabel
+    $Label   = $editionLabel
     $IconVal = "`"$VsCodeExe`""
 
     # Define entries
