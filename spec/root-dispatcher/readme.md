@@ -85,7 +85,7 @@ The bootstrap scripts live at `install.ps1` (Windows) and `install.sh` (Unix) in
 .\run.ps1 -Install go,git,cpp         # Install Go, Git, and C++
 .\run.ps1 -Install all-dev            # Interactive dev tools menu
 .\run.ps1 update                      # Upgrade all Chocolatey packages
-.\run.ps1 path D:\devtools            # Set default dev directory
+.\run.ps1 path D:\dev-tool            # Set default dev directory
 .\run.ps1 path                        # Show current dev directory
 .\run.ps1 path --reset                # Clear saved path, use smart detection
 .\run.ps1 -d                          # Shortcut for -I 12 (interactive menu)
