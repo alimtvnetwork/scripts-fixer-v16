@@ -524,6 +524,9 @@ function Show-RootHelp {
     Write-Host "    $("install conemu+settings".PadRight($kc))" -NoNewline; Write-Host "Same as conemu (explicit) [48 install+settings]" -ForegroundColor DarkGray
     Write-Host "    $("install conemu-settings".PadRight($kc))" -NoNewline; Write-Host "Apply ConEmu.xml only (skip install) [48 settings-only]" -ForegroundColor DarkGray
     Write-Host "    $("install install-conemu".PadRight($kc))" -NoNewline; Write-Host "Install ConEmu only (skip settings) [48 install-only]" -ForegroundColor DarkGray
+    Write-Host "    $("install conemu-menu".PadRight($kc))" -NoNewline; Write-Host "ConEmu + 'Open ConEmu Here' folder/background right-click [48,59]" -ForegroundColor DarkGray
+    Write-Host "    $("install conemu+menu".PadRight($kc))" -NoNewline; Write-Host "Same as conemu-menu (alias) [48,59]" -ForegroundColor DarkGray
+    Write-Host "    $("install conemu-context-menu".PadRight($kc))" -NoNewline; Write-Host "Same as conemu-menu (alias) [48,59]" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "      Other apps with bundled settings:" -ForegroundColor DarkYellow
     Write-Host "    $("install npp+settings".PadRight($kc))" -NoNewline; Write-Host "Notepad++ + settings [33 install+settings]" -ForegroundColor DarkGray
