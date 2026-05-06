@@ -2844,7 +2844,17 @@ if ($hasCommand) {
             Write-Host "OS dispatcher missing at: $osScript"
             exit 1
         }
-        & $osScript @Install
+        # Forward root-level -h / -Help (which PowerShell binds before $Install
+        # gets a chance) into the os dispatcher as an explicit --help action so
+        # `.\run.ps1 os -h` and `.\run.ps1 os -help` show the OS subcommand list.
+        $osArgs = @()
+        if ($null -ne $Install) { $osArgs = @($Install) }
+        $hasOsAction = ($osArgs.Count -gt 0) -and -not ("$($osArgs[0])".StartsWith("-"))
+        if (($h -or $Help) -and -not $hasOsAction) {
+            & $osScript "--help"
+            exit $LASTEXITCODE
+        }
+        & $osScript @osArgs
         exit $LASTEXITCODE
     }
 
