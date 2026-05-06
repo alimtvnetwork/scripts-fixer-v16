@@ -820,8 +820,11 @@ nothing else is deleted.
 .\run.ps1 os startup-list     # list lovable-startup-* tagged entries
 .\run.ps1 os startup-remove   # remove a tagged entry by name
 
-# Help
+# Help (all four show the same OS subcommand catalog)
 .\run.ps1 os --help           # shows every action incl. the 36 clean-* categories
+.\run.ps1 os help             # same -- bare 'help' keyword
+.\run.ps1 os -h               # same -- short flag
+.\run.ps1 os -help            # same -- single-dash long flag
 ```
 
 ---
