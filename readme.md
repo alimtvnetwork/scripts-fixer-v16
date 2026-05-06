@@ -801,7 +801,31 @@ nothing else is deleted.
 .\run.ps1 os update           # run Windows Update (scan + download + install)
 .\run.ps1 os temp-clean       # standalone temp/cache sweep
 .\run.ps1 os choco-clean      # chocolatey lib-bad/lib-bkp/.backup quarantine sweep
+```
 
+#### Usage examples: `os update`, `os power`, `os temp-clean`
+
+```powershell
+# os update -- Windows Update (scan + download + install)
+.\run.ps1 os update                    # full run: scan, download, install pending updates
+.\run.ps1 os update --dry-run          # scan only, list pending KBs, install nothing
+.\run.ps1 os update --yes              # non-interactive, auto-accept reboot prompts
+.\run.ps1 os update -h                 # show flags + PSWindowsUpdate fallback notes
+
+# os power -- apply powercfg never-sleep timeouts on AC + DC
+.\run.ps1 os power                     # default: monitor/standby/disk/hibernate = never
+.\run.ps1 os power --monitor 15        # screen off after 15 min, everything else never
+.\run.ps1 os power --restore           # revert to Windows balanced defaults
+.\run.ps1 os power --dry-run           # preview powercfg commands, apply nothing
+
+# os temp-clean -- standalone temp/cache sweep
+.\run.ps1 os temp-clean                # %TEMP% + %LOCALAPPDATA%\Temp + C:\Windows\Temp + choco temp
+.\run.ps1 os temp-clean --dry-run      # report files + reclaimable size, delete nothing
+.\run.ps1 os temp-clean --yes          # skip the confirmation prompt
+.\run.ps1 os temp-clean --days 7       # only delete entries older than 7 days
+```
+
+```powershell
 # Local users & groups
 .\run.ps1 os add-user         # create a local user
 .\run.ps1 os edit-user        # modify password / groups / flags
