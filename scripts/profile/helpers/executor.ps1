@@ -145,10 +145,11 @@ function Invoke-ProfileSteps {
         }) | Out-Null
 
         $color = switch ($status) {
-            "ok"   { "Green" }
-            "fail" { "Red" }
-            "skip" { "DarkGray" }
-            default { "Yellow" }
+            "ok"                { "Green" }
+            "already-installed" { "Cyan" }
+            "fail"              { "Red" }
+            "skip"              { "DarkGray" }
+            default             { "Yellow" }
         }
         Write-Host ("  >>> Step {0}/{1} {2} ({3}s)" -f $n, $total, $status.ToUpper(), [Math]::Round($elapsed, 1)) -ForegroundColor $color
         if ($status -eq "fail" -and $errorMsg) {
