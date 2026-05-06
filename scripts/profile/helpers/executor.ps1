@@ -25,6 +25,7 @@ function Invoke-ProfileSteps {
         Write-Host ("  ----- Step {0}/{1} : [{2}] {3} -----" -f $n, $total, $kind, $label) -ForegroundColor Cyan
 
         $sw = [System.Diagnostics.Stopwatch]::StartNew()
+        $stepStart = Get-Date
         $status = "ok"
         $errorMsg = ""
 
@@ -47,6 +48,11 @@ function Invoke-ProfileSteps {
                     if (-not $ok) {
                         $status = "fail"
                         $errorMsg = "script id=$id returned non-success"
+                    } else {
+                        # Detect "already installed" reruns by sniffing the
+                        # freshest .logs/<name>.json the child just wrote.
+                        $childStatus = Get-LastChildLogStatus -RootDir $RootDir -SinceUtc $stepStart.ToUniversalTime()
+                        if ($childStatus -eq "already-installed") { $status = "already-installed" }
                     }
                 }
                 "choco" {
