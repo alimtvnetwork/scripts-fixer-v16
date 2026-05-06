@@ -669,7 +669,15 @@ function Import-JsonConfig {
         )
     }
 
-    $slm = $script:SharedLogMessages
+    # Resolve $script:SharedLogMessages defensively. Under StrictMode Latest,
+    # reading an unset script-scope variable throws -- so callers that dot-
+    # source logging.ps1 and immediately call Import-JsonConfig (before any
+    # other shared loader populates SharedLogMessages) would die here.
+    $slm = $null
+    try {
+        $slmVar = Get-Variable -Name SharedLogMessages -Scope Script -ErrorAction SilentlyContinue
+        if ($slmVar) { $slm = $slmVar.Value }
+    } catch { $slm = $null }
 
     $isLabelMissing = [string]::IsNullOrWhiteSpace($Label)
     if ($isLabelMissing) { $Label = Split-Path -Leaf $FilePath }
