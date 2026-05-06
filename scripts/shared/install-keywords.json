@@ -136,6 +136,32 @@
       11,
       10
     ],
+    "vscode-fix-menu": [
+      52
+    ],
+    "fix-vscode-menu": [
+      52
+    ],
+    "vscode-menu-fix": [
+      52
+    ],
+    "vscode-menu-repair": [
+      52
+    ],
+    "fix-vscode-context-menu": [
+      52
+    ],
+    "vscode+fix": [
+      1,
+      11,
+      52
+    ],
+    "vscode+menu+fix": [
+      1,
+      11,
+      10,
+      52
+    ],
     "vs-settings-sync": [
       1,
       11
