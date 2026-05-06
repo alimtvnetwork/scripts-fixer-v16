@@ -524,6 +524,9 @@ function Show-RootHelp {
     Write-Host "    $("install conemu+settings".PadRight($kc))" -NoNewline; Write-Host "Same as conemu (explicit) [48 install+settings]" -ForegroundColor DarkGray
     Write-Host "    $("install conemu-settings".PadRight($kc))" -NoNewline; Write-Host "Apply ConEmu.xml only (skip install) [48 settings-only]" -ForegroundColor DarkGray
     Write-Host "    $("install install-conemu".PadRight($kc))" -NoNewline; Write-Host "Install ConEmu only (skip settings) [48 install-only]" -ForegroundColor DarkGray
+    Write-Host "    $("install conemu-menu".PadRight($kc))" -NoNewline; Write-Host "ConEmu + 'Open ConEmu Here' folder/background right-click [48,59]" -ForegroundColor DarkGray
+    Write-Host "    $("install conemu+menu".PadRight($kc))" -NoNewline; Write-Host "Same as conemu-menu (alias) [48,59]" -ForegroundColor DarkGray
+    Write-Host "    $("install conemu-context-menu".PadRight($kc))" -NoNewline; Write-Host "Same as conemu-menu (alias) [48,59]" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "      Other apps with bundled settings:" -ForegroundColor DarkYellow
     Write-Host "    $("install npp+settings".PadRight($kc))" -NoNewline; Write-Host "Notepad++ + settings [33 install+settings]" -ForegroundColor DarkGray
@@ -532,7 +535,7 @@ function Show-RootHelp {
     Write-Host "    $("install dbeaver+settings".PadRight($kc))" -NoNewline; Write-Host "DBeaver + settings [32 install+settings]" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "      All settings at once:" -ForegroundColor DarkYellow
-    Write-Host "    $("install all-settings".PadRight($kc))" -NoNewline; Write-Host "Install + apply ALL bundled settings: VS Code, NPP, OBS, WT, DBeaver, ConEmu [01,11,32,33,36,37,48]" -ForegroundColor DarkGray
+    Write-Host "    $("install all-settings".PadRight($kc))" -NoNewline; Write-Host "Install + apply ALL bundled settings: VS Code, NPP, OBS, WT, DBeaver, ConEmu (+ ConEmu right-click) [01,11,32,33,36,37,48,59]" -ForegroundColor DarkGray
     Write-Host "    $("install settings".PadRight($kc))" -NoNewline; Write-Host "Same as all-settings (alias)" -ForegroundColor DarkGray
     Write-Host "    $("install all-settings --exclude obs,wt".PadRight($kc))" -NoNewline; Write-Host "Apply all settings EXCEPT the listed apps" -ForegroundColor DarkGray
     Write-Host "    $("install all-settings --exclude=conemu".PadRight($kc))" -NoNewline; Write-Host "Inline form (=) also accepted; valid tokens: vscode,npp,obs,wt,dbeaver,conemu" -ForegroundColor DarkGray
@@ -550,7 +553,8 @@ function Show-RootHelp {
     Write-Host "      $("obs".PadRight(20))" -NoNewline; Write-Host "$("[36]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "obs-studio, obs+settings, obs-settings, install-obs" -ForegroundColor DarkGray
     Write-Host "      $("wt".PadRight(20))" -NoNewline; Write-Host "$("[37]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "windows-terminal, wt+settings, wt-settings, install-wt" -ForegroundColor DarkGray
     Write-Host "      $("dbeaver".PadRight(20))" -NoNewline; Write-Host "$("[32]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "db-viewer, dbviewer, dbeaver+settings, dbeaver-settings" -ForegroundColor DarkGray
-    Write-Host "      $("conemu".PadRight(20))" -NoNewline; Write-Host "$("[48]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "conemu+settings, conemu-settings, install-conemu" -ForegroundColor DarkGray
+    Write-Host "      $("conemu".PadRight(20))" -NoNewline; Write-Host "$("[48, 59]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "conemu+settings, conemu-settings, install-conemu, conemu-menu, conemu+menu, conemu-context-menu" -ForegroundColor DarkGray
+    Write-Host "      $("conemu-menu".PadRight(20))" -NoNewline; Write-Host "$("[59]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "conemu+menu, conemu-context-menu (right-click only; keeps script 48 install)" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "      Flag spellings (all equivalent):" -ForegroundColor DarkGray
     Write-Host "        --exclude  -exclude  --ex  -ex  --without  -without  --skip  -skip" -ForegroundColor DarkGray
