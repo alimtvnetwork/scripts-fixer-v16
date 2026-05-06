@@ -592,23 +592,42 @@ function Import-JsonConfig {
     # In every case we fall back to a literal template so the dispatcher
     # doesn't crash with "Cannot index into a null array" at line 590.
     # ----------------------------------------------------------------------
-    function _ic_msg([string]$Key, [string]$Fallback) {
-        if ($null -ne $slm -and
-            $null -ne $slm.PSObject.Properties['messages'] -and
-            $null -ne $slm.messages -and
-            $null -ne $slm.messages.PSObject.Properties[$Key]) {
-            $tpl = [string]$slm.messages.$Key
-            if (-not [string]::IsNullOrWhiteSpace($tpl)) { return $tpl }
+    # Inline defensive template lookup (avoid nested-function scoping pitfalls
+    # that can leave $tpl* as $null and trip "Cannot index into a null array"
+    # on the subsequent -replace chain).
+    $tplLoading  = 'Loading {label} from: {path}'
+    $tplNotFound = '{label} not found at path: {path}'
+    $tplSize     = '{label} file size: {size} chars'
+    $tplLoaded   = '{label} loaded successfully'
+
+    if ($null -ne $slm -and
+        $null -ne $slm.PSObject.Properties['messages'] -and
+        $null -ne $slm.messages) {
+        $msgs = $slm.messages
+        if ($null -ne $msgs.PSObject.Properties['importLoading']) {
+            $v = [string]$msgs.importLoading
+            if (-not [string]::IsNullOrWhiteSpace($v))  { $tplLoading = $v }
         }
-        return $Fallback
+        if ($null -ne $msgs.PSObject.Properties['importNotFound']) {
+            $v = [string]$msgs.importNotFound
+            if (-not [string]::IsNullOrWhiteSpace($v))  { $tplNotFound = $v }
+        }
+        if ($null -ne $msgs.PSObject.Properties['importFileSize']) {
+            $v = [string]$msgs.importFileSize
+            if (-not [string]::IsNullOrWhiteSpace($v))  { $tplSize = $v }
+        }
+        if ($null -ne $msgs.PSObject.Properties['importLoaded']) {
+            $v = [string]$msgs.importLoaded
+            if (-not [string]::IsNullOrWhiteSpace($v))  { $tplLoaded = $v }
+        }
     }
 
-    $tplLoading  = _ic_msg 'importLoading'  'Loading {label} from: {path}'
-    $tplNotFound = _ic_msg 'importNotFound' '{label} not found at path: {path}'
-    $tplSize     = _ic_msg 'importFileSize' '{label} file size: {size} chars'
-    $tplLoaded   = _ic_msg 'importLoaded'   '{label} loaded successfully'
+    # Coerce to string and guarantee non-null operands for -replace chains.
+    $safeLabel = if ($null -eq $Label)    { '' } else { [string]$Label }
+    $safePath  = if ($null -eq $FilePath) { '' } else { [string]$FilePath }
 
-    Write-Log (($tplLoading -replace '\{label\}', $Label) -replace '\{path\}', $FilePath) -Level "info"
+    $msgLoading = ([string]$tplLoading).Replace('{label}', $safeLabel).Replace('{path}', $safePath)
+    Write-Log $msgLoading -Level "info"
 
     $isFileMissing = -not (Test-Path $FilePath)
     if ($isFileMissing) {
