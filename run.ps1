@@ -338,6 +338,39 @@ function Show-RootHelp {
     Write-Host "    $(".\run.ps1 -List".PadRight($col))" -NoNewline; Write-Host "Show keyword table only" -ForegroundColor DarkGray
     Write-Host ""
 
+    # ── Profiles section (dynamic, read from scripts/profile/config.json) ──
+    Write-Host "  Profiles:" -ForegroundColor Yellow
+    Write-Host "  (multi-step install recipes -- run with 'profile <name>' or 'install <name>')" -ForegroundColor DarkGray
+    Write-Host ""
+    $profileCfgPath = Join-Path $RootDir "scripts\profile\config.json"
+    $hasProfileCfg = Test-Path $profileCfgPath
+    if ($hasProfileCfg) {
+        try {
+            $profCfgHelp = Get-Content $profileCfgPath -Raw | ConvertFrom-Json
+            $pc = 22
+            foreach ($pname in $profCfgHelp.profiles.PSObject.Properties.Name) {
+                $pdef = $profCfgHelp.profiles.$pname
+                $pdesc = if ($pdef.description) { $pdef.description } elseif ($pdef.label) { $pdef.label } else { "" }
+                Write-Host "    $($pname.PadRight($pc))" -NoNewline -ForegroundColor Green
+                Write-Host $pdesc -ForegroundColor DarkGray
+            }
+        } catch {
+            Write-Host "    (failed to read $profileCfgPath -- run '.\run.ps1 profile list')" -ForegroundColor DarkYellow
+        }
+    } else {
+        Write-Host "    (profile config not found at: $profileCfgPath)" -ForegroundColor DarkYellow
+    }
+    Write-Host ""
+    Write-Host "  Profile Examples:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "    .\run.ps1 profile list                  " -NoNewline; Write-Host "List all profiles with full descriptions" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 profile minimal               " -NoNewline; Write-Host "Run the 'minimal' bootstrap recipe" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 install minimal               " -NoNewline; Write-Host "Same as above (install <profile> shortcut)" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 profile base --dry-run        " -NoNewline; Write-Host "Print the expanded step list, do not execute" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 profile advance -y            " -NoNewline; Write-Host "Run 'advance' and skip confirmation prompts" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 install dev-advance           " -NoNewline; Write-Host "Run the 'dev-advance' profile via install shortcut" -ForegroundColor DarkGray
+    Write-Host ""
+
     Write-Host "  Install by Keyword:" -ForegroundColor Yellow
     Write-Host ""
     $kc = 44
