@@ -472,6 +472,15 @@ switch ($normalizedAction) {
         & (Join-Path $scriptDir "helpers\email.ps1") @Rest
         exit $LASTEXITCODE
     }
+    { $_ -in @(
+        "fix-vscode-context-menu", "fix-vscode-menu",
+        "vscode-context-menu", "vscode-folder-menu",
+        "fix-vscode-folder-menu", "vscode-menu-fix",
+        "repair-vscode-menu"
+    ) } {
+        & (Join-Path $scriptDir "helpers\fix-vscode-context-menu.ps1") @Rest
+        exit $LASTEXITCODE
+    }
     { $_ -in @("help", "--help", "-help", "-h", "/?", "?", "") } {
         Show-OsHelp
         exit 0
