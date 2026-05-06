@@ -825,26 +825,36 @@ nothing else is deleted.
 .\run.ps1 os temp-clean --days 7       # only delete entries older than 7 days
 ```
 
+#### Local users & groups
+
 ```powershell
-# Local users & groups
 .\run.ps1 os add-user         # create a local user
 .\run.ps1 os edit-user        # modify password / groups / flags
 .\run.ps1 os remove-user      # delete a local user (optionally purge profile)
 .\run.ps1 os add-user-json users.json       # bulk add from JSON
 .\run.ps1 os add-group        # create a local group
 .\run.ps1 os add-group-json groups.json     # bulk add groups
+```
 
-# SSH keys (cross-OS ledger aware)
+#### SSH keys (cross-OS ledger aware)
+
+```powershell
 .\run.ps1 os gen-key          # generate ed25519 keypair into %USERPROFILE%\.ssh
 .\run.ps1 os install-key      # install a public key into authorized_keys
 .\run.ps1 os revoke-key       # remove + mark revoked in the ledger
+```
 
-# Startup entries (apps + env vars at logon)
+#### Startup entries (apps + env vars at logon)
+
+```powershell
 .\run.ps1 os startup-add      # register app or env-var
 .\run.ps1 os startup-list     # list lovable-startup-* tagged entries
 .\run.ps1 os startup-remove   # remove a tagged entry by name
+```
 
-# Help (all four show the same OS subcommand catalog)
+#### Help (all four show the same OS subcommand catalog)
+
+```powershell
 .\run.ps1 os --help           # shows every action incl. the 36 clean-* categories
 .\run.ps1 os help             # same -- bare 'help' keyword
 .\run.ps1 os -h               # same -- short flag
