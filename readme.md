@@ -727,12 +727,34 @@ dispatcher: [`scripts/os/run.ps1`](scripts/os/run.ps1).
 
 | Subcommand | What it does | Admin |
 |------------|--------------|:-----:|
+| **Cleanup** | | |
 | `os clean` | Master cleaner: temp + Windows Update cache + chocolatey lib-bad/lib-bkp + recycle bin + event logs + PSReadLine history | 🛡️ Yes |
 | `os clean --dry-run` | **Preview only** — scans every target and reports files + size, deletes nothing | 👤 No |
 | `os clean-<category>` | Run a single category — 36 categories, e.g. `clean-chrome`, `clean-recycle`, `clean-obs-recordings`, `clean-chkdsk` (see `os --help`) | varies |
+| `os temp-clean` | Standalone `%TEMP%` + `%LOCALAPPDATA%\Temp` + `C:\Windows\Temp` + per-user temp + chocolatey temp sweep | 🛡️ Yes |
+| `os choco-clean` | Quarantine sweep for `lib-bad`, `lib-bkp`, stale `.backup`, leftover `.nupkg`, plus optional `choco-cleaner` | 🛡️ Yes |
+| **System tweaks** | | |
 | `os hib-off` / `os hib-on` | `powercfg /hibernate off` (frees `C:\hiberfil.sys`, often 4-16 GB) | 🛡️ Yes |
-| `os flp` | Fix long paths (`HKLM\SYSTEM\...\FileSystem\LongPathsEnabled = 1`) | 🛡️ Yes · 🔁 reboot |
+| `os flp` (`fix-long-path`) | Fix long paths (`HKLM\SYSTEM\...\FileSystem\LongPathsEnabled = 1`) | 🛡️ Yes · 🔁 reboot |
+| `os power` (`no-sleep`) | Apply powercfg monitor/standby/disk/hibernate timeouts (defaults: never sleep) on AC + DC | 🛡️ Yes |
+| `os update` | Trigger Windows Update scan + download + install via `UsoClient` / `PSWindowsUpdate` | 🛡️ Yes |
+| **Local users & groups** | | |
 | `os add-user` | Create a local Windows user account with sensible defaults | 🛡️ Yes |
+| `os edit-user` | Modify an existing local user (password, full name, groups, flags) | 🛡️ Yes |
+| `os remove-user` | Delete a local user, optionally purging the profile folder | 🛡️ Yes |
+| `os add-user-json` / `edit-user-json` / `remove-user-json` | Bulk user ops driven by a JSON file (single object, array, or `{ users: [] }`) | 🛡️ Yes |
+| `os add-group` | Create a local group | 🛡️ Yes |
+| `os add-group-json` | Bulk group create from a JSON file | 🛡️ Yes |
+| **SSH keys** | | |
+| `os gen-key` | Generate an SSH keypair (ed25519 by default) into `%USERPROFILE%\.ssh` and update the cross-OS ledger | 👤 No |
+| `os install-key` | Install a public key into `authorized_keys` for a local user | 🛡️ Yes |
+| `os revoke-key` | Remove a public key from `authorized_keys` and mark it revoked in the ledger | 🛡️ Yes |
+| **Startup entries** | | |
+| `os startup-add` | Register an app or env-var to run/exist at logon (Startup folder, HKCU/HKLM Run, or scheduled task) | varies |
+| `os startup-list` | List all `lovable-startup-*` tagged entries across methods | 👤 No |
+| `os startup-remove` | Remove a tagged startup entry by name | varies |
+| **macOS** | | |
+| `os clean-vscode-mac` | macOS-only: surgical removal of VS Code Services, `code` CLI symlink, LaunchServices entries, login items, LaunchAgents | 👤 No |
 
 ### What `os clean` actually touches
 
