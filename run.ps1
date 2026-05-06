@@ -863,29 +863,83 @@ function Resolve-InstallKeywords {
     # Resolve excludeTokens -> set of script IDs to drop. Each exclude token
     # is looked up via the same keywordMap so users can write "obs", "vscode",
     # "conemu", "npp", "wt", "dbeaver" -- whatever maps to a script ID.
-    $excludeIds = [System.Collections.Generic.HashSet[int]]::new()
+    $excludeIds      = [System.Collections.Generic.HashSet[int]]::new()
+    $acceptedExcl    = [System.Collections.Generic.List[pscustomobject]]::new()
+    $ignoredExcl     = [System.Collections.Generic.List[pscustomobject]]::new()
+
+    # Pre-compute the set of valid exclude tokens (anything that maps to at least
+    # one numeric script ID via the keyword map). Used for suggestions on typos.
+    $validExcludeTokens = [System.Collections.Generic.List[string]]::new()
+    foreach ($kvKey in $keywordMap.Keys) {
+        $kvVal = $keywordMap.$kvKey
+        $hasNumericId = $false
+        foreach ($vv in @($kvVal)) {
+            if ($vv -is [int] -or ($vv -is [string] -and $vv -match '^\d+$')) { $hasNumericId = $true; break }
+        }
+        if ($hasNumericId) { [void]$validExcludeTokens.Add([string]$kvKey) }
+    }
+
     foreach ($exTok in $excludeTokens) {
-        $exIds = $keywordMap.$exTok
+        $matchedKey = $exTok
+        $exIds      = $keywordMap.$exTok
         if ($null -eq $exIds) {
             $exStripped = $exTok -replace '-', ''
-            $exIds = $keywordMap.$exStripped
+            $exIds      = $keywordMap.$exStripped
+            if ($null -ne $exIds) { $matchedKey = $exStripped }
         }
         if ($null -eq $exIds) {
-            Write-Host "  [ WARN ] " -ForegroundColor Yellow -NoNewline
-            Write-Host "Unknown --exclude token: '$exTok' (ignored)"
+            # Build a small "did you mean" suggestion list (cheap prefix/contains match).
+            $suggestions = @($validExcludeTokens | Where-Object {
+                $_.StartsWith($exTok) -or $exTok.StartsWith($_) -or $_.Contains($exTok) -or $exTok.Contains($_)
+            } | Select-Object -Unique -First 5)
+            $hint = if ($suggestions.Count -gt 0) { " Did you mean: $($suggestions -join ', ')?" } else { "" }
+            Write-Log "Unknown --exclude token '$exTok' -- ignored.$hint" -Level "warn"
+            $ignoredExcl.Add([pscustomobject]@{ Token = $exTok; Reason = "no matching keyword"; Suggestions = $suggestions })
             continue
         }
+        $resolvedIds = [System.Collections.Generic.List[int]]::new()
         foreach ($exId in $exIds) {
             if ($exId -is [int] -or ($exId -is [string] -and $exId -match '^\d+$')) {
-                [void]$excludeIds.Add([int]$exId)
+                $idInt = [int]$exId
+                if ($excludeIds.Add($idInt)) { $resolvedIds.Add($idInt) }
+                else { $resolvedIds.Add($idInt) }  # still record for accepted summary
             }
         }
+        if ($resolvedIds.Count -eq 0) {
+            Write-Log "Exclude token '$exTok' matched keyword '$matchedKey' but resolved to no numeric script IDs -- ignored." -Level "warn"
+            $ignoredExcl.Add([pscustomobject]@{ Token = $exTok; Reason = "matched keyword but no numeric IDs"; Suggestions = @() })
+            continue
+        }
+        $acceptedExcl.Add([pscustomobject]@{
+            Token       = $exTok
+            MatchedKey  = $matchedKey
+            ResolvedIds = $resolvedIds
+        })
     }
+
+    $hasExcludeTokens = $excludeTokens.Count -gt 0
+    if ($hasExcludeTokens) {
+        if ($acceptedExcl.Count -gt 0) {
+            foreach ($ae in $acceptedExcl) {
+                $idStr = ($ae.ResolvedIds | Sort-Object -Unique | ForEach-Object { "{0:D2}" -f $_ }) -join ", "
+                Write-Log "Accepted --exclude token '$($ae.Token)' -> [$idStr]" -Level "info"
+            }
+        }
+        if ($ignoredExcl.Count -gt 0) {
+            $ignoredList = ($ignoredExcl | ForEach-Object { "'$($_.Token)'" }) -join ", "
+            Write-Log "Ignored --exclude tokens: $ignoredList" -Level "warn"
+        }
+    }
+
     $hasExcludes = $excludeIds.Count -gt 0
     if ($hasExcludes) {
         $excludeList = ($excludeIds | Sort-Object | ForEach-Object { "{0:D2}" -f $_ }) -join ", "
-        Write-Host "  [ INFO ] " -ForegroundColor Cyan -NoNewline
-        Write-Host "Excluding script IDs: $excludeList"
+        Write-Log "Excluding script IDs: $excludeList" -Level "info"
+    } elseif ($hasExcludeTokens) {
+        # User passed --exclude but nothing actually matched -- be loud about it
+        # so they don't think the bundle was filtered when it wasn't.
+        $validSample = ($validExcludeTokens | Sort-Object | Select-Object -First 12) -join ", "
+        Write-Log "No --exclude tokens were valid; full bundle will run. Valid examples: $validSample ..." -Level "warn"
     }
 
     # Mode priority: install+settings > install-only / settings-only > null
