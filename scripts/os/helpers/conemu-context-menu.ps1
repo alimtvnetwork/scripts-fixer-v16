@@ -154,8 +154,10 @@ try {
     }
 
     $named = @{}
-    if ($wantsDryRun)                                      { $named['DryRun']       = $true }
-    if (-not [string]::IsNullOrWhiteSpace($snapshotFile))  { $named['SnapshotFile'] = $snapshotFile }
+    if ($wantsDryRun)                                      { $named['DryRun']         = $true }
+    if ($nonInteractive)                                   { $named['NonInteractive'] = $true }
+    if ($assumeYes)                                        { $named['AssumeYes']      = $true }
+    if (-not [string]::IsNullOrWhiteSpace($snapshotFile))  { $named['SnapshotFile']   = $snapshotFile }
 
     if ($passthrough.Count -gt 0) {
         & $script59Run $subCommand @named @passthrough
