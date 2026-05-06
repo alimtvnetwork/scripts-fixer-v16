@@ -42,7 +42,7 @@
     .\run.ps1 update --check           # list outdated packages (no upgrade)
     .\run.ps1 update -y                # upgrade all, skip confirmation
     .\run.ps1 update --exclude=choco   # upgrade all except listed
-    .\run.ps1 path D:\devtools       # set default dev directory
+    .\run.ps1 path D:\dev-tool       # set default dev directory
     .\run.ps1 path                   # show current dev directory
     .\run.ps1 path --reset           # clear saved path, use smart detection
     .\run.ps1 -d                     # shortcut for -I 12 (interactive menu)
@@ -789,10 +789,10 @@ function Show-RootHelp {
 
     Write-Host "  Change default dev directory:" -ForegroundColor Yellow
     Write-Host "    .\run.ps1 path                      Show current default dev directory" -ForegroundColor DarkGray
-    Write-Host "    .\run.ps1 path D:\devtools          Set default dev directory (persisted)" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 path D:\dev-tool          Set default dev directory (persisted)" -ForegroundColor DarkGray
     Write-Host "    .\run.ps1 path --reset              Clear saved path, use smart detection" -ForegroundColor DarkGray
-    Write-Host "    `$env:DEV_DIR = 'D:\devtools'        Per-session override (highest priority)" -ForegroundColor DarkGray
-    Write-Host "    .\run.ps1 -I <id> -Path D:\devtools  One-shot override for this run" -ForegroundColor DarkGray
+    Write-Host "    `$env:DEV_DIR = 'D:\dev-tool'        Per-session override (highest priority)" -ForegroundColor DarkGray
+    Write-Host "    .\run.ps1 -I <id> -Path D:\dev-tool  One-shot override for this run" -ForegroundColor DarkGray
     Write-Host ""
 
     Show-VersionFooter
@@ -2428,7 +2428,7 @@ function Invoke-PathCommand {
         }
         Write-Host ""
         Write-Host "  Usage:" -ForegroundColor Yellow
-        Write-Host "    .\run.ps1 path D:\devtools          " -NoNewline; Write-Host "Set default dev directory" -ForegroundColor DarkGray
+        Write-Host "    .\run.ps1 path D:\dev-tool          " -NoNewline; Write-Host "Set default dev directory" -ForegroundColor DarkGray
         Write-Host "    .\run.ps1 path                      " -NoNewline; Write-Host "Show current dev directory" -ForegroundColor DarkGray
         Write-Host "    .\run.ps1 path --reset              " -NoNewline; Write-Host "Clear saved path, use smart detection" -ForegroundColor DarkGray
         Write-Host ""
@@ -2441,7 +2441,7 @@ function Invoke-PathCommand {
     if (-not $isValidFormat) {
         Write-Host ""
         Write-Host "  [ FAIL ] " -ForegroundColor Red -NoNewline
-        Write-Host "Invalid path format. Use a full path like D:\devtools or F:\dev-tool"
+        Write-Host "Invalid path format. Use a full path like D:\dev-tool or F:\dev-tool"
         Write-Host ""
         return
     }
@@ -2460,7 +2460,7 @@ function Invoke-PathCommand {
 #             .\run.ps1 install alldev mysql
 #             .\run.ps1 -Install alldev,mysql
 #             .\run.ps1 update
-#             .\run.ps1 path D:\devtools
+#             .\run.ps1 path D:\dev-tool
 $normalizedCommand = ""
 $hasCommand = -not [string]::IsNullOrWhiteSpace($Command)
 if ($hasCommand) {

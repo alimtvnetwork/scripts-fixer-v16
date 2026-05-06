@@ -63,7 +63,7 @@ Manage the persistent dev directory override stored in `scripts/dev-path.json`.
 | `Set-SavedDevPath -Path <dir>` | Writes `{"path": "<dir>"}` to `scripts/dev-path.json` |
 | `Remove-SavedDevPath` | Deletes `scripts/dev-path.json` |
 
-Set via `.\run.ps1 path D:\devtools`. Read automatically by `Resolve-DevDir`.
+Set via `.\run.ps1 path D:\dev-tool`. Read automatically by `Resolve-DevDir`.
 
 ---
 
