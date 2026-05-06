@@ -453,7 +453,7 @@ switch ($normalizedAction) {
         & (Join-Path $scriptDir "helpers\power.ps1") @Rest
         exit $LASTEXITCODE
     }
-    { $_ -in @("help", "--help", "-h", "") } {
+    { $_ -in @("help", "--help", "-help", "-h", "/?", "?", "") } {
         Show-OsHelp
         exit 0
     }
