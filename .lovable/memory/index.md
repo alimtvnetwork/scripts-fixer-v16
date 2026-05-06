@@ -18,6 +18,7 @@ STRICTLY-PROHIBITED (SP-1..SP-6): NEVER write or suggest date/time/timestamp con
 - [Script structure](mem://preferences/script-structure) — How the user wants scripts organized with configs, specs, and suggestions
 - [Naming conventions](mem://preferences/naming-conventions) — is/has prefix for booleans; avoid bare -not checks
 - [Terminal banners](mem://constraints/terminal-banners) — Avoid em dashes and wide Unicode in box-drawing banners
+- [Dev directory naming](mem://preferences/dev-dir-naming) — Default dev dir is always `dev-tool` (hyphenated) in all code/docs/help text
 - [Error management file path rule](mem://features/error-management-file-path-rule) — CODE RED: every file/path error must include exact path and failure reason
 - [Install-paths trio](mem://features/install-paths-trio) — CODE RED: Source + Temp + Target logged via Write-InstallPaths on every install
 - [Database scripts](mem://features/database-scripts) — Database installer script patterns
