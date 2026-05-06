@@ -181,7 +181,16 @@ function Show-ProfileList {
     }
     Write-Host ""
 
+    # Issues report for the profiles config (errors + warnings, with file paths)
+    if ($hasValidator -and $cfgValidation) {
+        Format-ProfileConfigIssues -Result $cfgValidation -Title "Profile config issues"
+    }
+
     # ── Aliases (exact + fallback) ─────────────────────────────────────
+    if ($hasValidator) {
+        $knownNames = @($entries | ForEach-Object { $_.Name })
+        $aliasValidation = Test-ProfileAliasesConfig -FilePath $aliasesPath -KnownProfileNames $knownNames
+    }
     if (Test-Path -LiteralPath $aliasesPath) {
         try {
             $aliasCfg = Get-Content -LiteralPath $aliasesPath -Raw | ConvertFrom-Json
