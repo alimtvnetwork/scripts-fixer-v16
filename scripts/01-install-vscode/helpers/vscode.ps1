@@ -107,11 +107,21 @@ function Invoke-VsCodeSetup {
     $isAutoYes = $env:SCRIPTS_AUTO_YES -eq "1"
     $shouldPrompt = [bool]$Config.promptEdition
 
+    # Local helper: forward to Install-VsCodeEdition with the canonical
+    # tracking name so .installed/ files are 'vscode.json' / 'vscode-insiders.json'
+    # (not 'vscode-vs-code-stable.json').
+    function Install-VsCodeEditionByKey([string]$Key) {
+        $ed = $editions.$Key
+        $tracking = if ($Key -eq "insiders") { "vscode-insiders" } else { "vscode" }
+        Install-VsCodeEdition -ChocoPackageName $ed.chocoPackageName `
+                              -Label $ed.label `
+                              -TrackingName $tracking `
+                              -LogMessages $LogMessages
+    }
+
     switch ($Command) {
         "stable" {
-            Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                   -Label $editions.stable.label `
-                                   -LogMessages $LogMessages
+            Install-VsCodeEditionByKey "stable"
         }
         "insiders" {
             Install-VsCodeEdition -ChocoPackageName $editions.insiders.chocoPackageName `
