@@ -392,6 +392,7 @@ function Show-RootHelp {
     Write-Host "    $("install settings".PadRight($kc))" -NoNewline; Write-Host "Same as all-settings (alias)" -ForegroundColor DarkGray
     Write-Host "    $("install all-settings --exclude obs,wt".PadRight($kc))" -NoNewline; Write-Host "Apply all settings EXCEPT the listed apps" -ForegroundColor DarkGray
     Write-Host "    $("install all-settings --exclude=conemu".PadRight($kc))" -NoNewline; Write-Host "Inline form (=) also accepted; valid tokens: vscode,npp,obs,wt,dbeaver,conemu" -ForegroundColor DarkGray
+    Write-Host "    $("install all-settings --exclude obs,xyz --exclude-strict".PadRight($kc))" -NoNewline; Write-Host "Abort (exit 2) if any --exclude token is unknown instead of warning" -ForegroundColor DarkGray
     Write-Host ""
 
     Write-Host "    Python & pip libraries:" -ForegroundColor Magenta
