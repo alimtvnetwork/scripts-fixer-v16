@@ -498,7 +498,15 @@ switch ($normalizedAction) {
         & (Join-Path $scriptDir "helpers\fix-vscode-context-menu.ps1") @Rest
         exit $LASTEXITCODE
     }
-    { $_ -in @("help", "--help", "-help", "-h", "/?", "?", "") } {
+    { $_ -in @(
+        "conemu-context-menu", "conemu-menu",
+        "conemu-folder-menu", "conemu-right-click",
+        "fix-conemu-context-menu", "fix-conemu-menu",
+        "manage-conemu-menu"
+    ) } {
+        & (Join-Path $scriptDir "helpers\conemu-context-menu.ps1") @Rest
+        exit $LASTEXITCODE
+    }
         Show-OsHelp
         exit 0
     }
