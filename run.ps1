@@ -392,6 +392,7 @@ function Show-RootHelp {
     Write-Host "    $("install settings".PadRight($kc))" -NoNewline; Write-Host "Same as all-settings (alias)" -ForegroundColor DarkGray
     Write-Host "    $("install all-settings --exclude obs,wt".PadRight($kc))" -NoNewline; Write-Host "Apply all settings EXCEPT the listed apps" -ForegroundColor DarkGray
     Write-Host "    $("install all-settings --exclude=conemu".PadRight($kc))" -NoNewline; Write-Host "Inline form (=) also accepted; valid tokens: vscode,npp,obs,wt,dbeaver,conemu" -ForegroundColor DarkGray
+    Write-Host "    $("install all-settings --exclude obs,xyz --exclude-strict".PadRight($kc))" -NoNewline; Write-Host "Abort (exit 2) if any --exclude token is unknown instead of warning" -ForegroundColor DarkGray
     Write-Host ""
 
     Write-Host "    Python & pip libraries:" -ForegroundColor Magenta
@@ -883,6 +884,7 @@ function Resolve-InstallKeywords {
     $tokens = [System.Collections.Generic.List[string]]::new()
     $excludeTokens = [System.Collections.Generic.List[string]]::new()
     $pendingExclude = $false
+    $isExcludeStrict = $false
     foreach ($keywordGroup in $Keywords) {
         $isKeywordGroupMissing = [string]::IsNullOrWhiteSpace($keywordGroup)
         if ($isKeywordGroupMissing) {
@@ -891,6 +893,11 @@ function Resolve-InstallKeywords {
 
         $rawTrim  = "$keywordGroup".Trim()
         $rawLower = $rawTrim.ToLower()
+
+        # --exclude-strict: standalone toggle that turns unknown --exclude tokens
+        # into a hard abort instead of a warning. Accepts a few common spellings.
+        $isStrictFlag = $rawLower -in @("--exclude-strict","-exclude-strict","--strict-exclude","-strict-exclude","--excludestrict","-excludestrict")
+        if ($isStrictFlag) { $isExcludeStrict = $true; continue }
 
         # --exclude / -exclude / --ex / --without (consumes the next arg as CSV/space list)
         $isExcludeFlag = $rawLower -in @("--exclude","-exclude","--ex","-ex","--without","-without","--skip","-skip")
@@ -983,6 +990,21 @@ function Resolve-InstallKeywords {
             $ignoredList = ($ignoredExcl | ForEach-Object { "'$($_.Token)'" }) -join ", "
             Write-Log "Ignored --exclude tokens: $ignoredList" -Level "warn"
         }
+    }
+
+    # --exclude-strict: abort the entire run if any --exclude tokens were unknown
+    # or otherwise unresolvable. Prints a clear actionable error before exiting.
+    if ($isExcludeStrict -and $ignoredExcl.Count -gt 0) {
+        $badList = ($ignoredExcl | ForEach-Object { "'$($_.Token)'" }) -join ", "
+        Write-Log "--exclude-strict is set and $($ignoredExcl.Count) --exclude token(s) were invalid: $badList" -Level "fail"
+        foreach ($bad in $ignoredExcl) {
+            $sugg = if ($bad.Suggestions -and $bad.Suggestions.Count -gt 0) { " (did you mean: $($bad.Suggestions -join ', ')?)" } else { "" }
+            Write-Log "  - '$($bad.Token)': $($bad.Reason)$sugg" -Level "fail"
+        }
+        $validSample = ($validExcludeTokens | Sort-Object | Select-Object -First 12) -join ", "
+        Write-Log "Valid --exclude tokens include: $validSample ..." -Level "info"
+        Write-Log "Aborting. Re-run without --exclude-strict to continue with the valid tokens only." -Level "info"
+        exit 2
     }
 
     $hasExcludes = $excludeIds.Count -gt 0
