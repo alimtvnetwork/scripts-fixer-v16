@@ -74,6 +74,8 @@ if ($null -ne $Rest -and $Rest.Count -gt 0) {
         $tok = "$($Rest[$i])".Trim().ToLower()
         switch -Regex ($tok) {
             '^(--?dry-run|dry-run)$'                  { $DryRun = $true }
+            '^(--?non-interactive|non-interactive|--?headless|headless)$' { $NonInteractive = $true }
+            '^(--?yes|-y|yes|--?assume-yes|assume-yes|--?force|force)$'   { $AssumeYes = $true }
             '^(--?snapshot-file|snapshot-file|--?file|file)$' {
                 $i++
                 if ($i -lt $Rest.Count) { $SnapshotFile = "$($Rest[$i])" }
