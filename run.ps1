@@ -944,10 +944,8 @@ function Resolve-InstallKeywords {
             if ($null -ne $exIds) { $matchedKey = $exStripped }
         }
         if ($null -eq $exIds) {
-            # Build a small "did you mean" suggestion list (cheap prefix/contains match).
-            $suggestions = @($validExcludeTokens | Where-Object {
-                $_.StartsWith($exTok) -or $exTok.StartsWith($_) -or $_.Contains($exTok) -or $exTok.Contains($_)
-            } | Select-Object -Unique -First 5)
+            # Rank closest valid tokens by Levenshtein distance (with prefix/substring bonus).
+            $suggestions = Get-DidYouMean -Token $exTok -Candidates $validExcludeTokens -Top 3
             $hint = if ($suggestions.Count -gt 0) { " Did you mean: $($suggestions -join ', ')?" } else { "" }
             Write-Log "Unknown --exclude token '$exTok' -- ignored.$hint" -Level "warn"
             $ignoredExcl.Add([pscustomobject]@{ Token = $exTok; Reason = "no matching keyword"; Suggestions = $suggestions })
