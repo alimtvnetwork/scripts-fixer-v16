@@ -2,407 +2,1435 @@
   "_comment": "Keyword-to-script-ID mapping for .\\run.ps1 Install <keyword> shortcut. Keys are lowercase. Multiple IDs = installs in sequence.",
   "_modeComment": "Entries in 'modes' override the default mode for a script. Format: { scriptId: mode }. Used for NPP variants.",
   "keywords": {
-    "vscode":            [1],
-    "vs-code":           [1],
-    "code":              [1],
-    "choco":             [2],
-    "chocolatey":        [2],
-    "package-managers":  [2],
-    "packagemanagers":   [2],
-    "nodejs":            [3],
-    "node":              [3],
-    "node.js":           [3],
-    "yarn":              [3],
-    "bun":               [3],
-    "pnpm":              [3, 4],
-    "python":            [5],
-    "pip":               [5],
-    "python-pip":        [5],
-    "pythonpip":         [5],
-    "go":                [6],
-    "golang":            [6],
-    "git":               [7],
-    "git-lfs":           [7],
-    "gitlfs":            [7],
-    "gh":                [7],
-    "github-cli":        [7],
-    "githubcli":         [7],
-    "github-desktop":    [8],
-    "githubdesktop":     [8],
-    "cpp":               [9],
-    "c++":               [9],
-    "mingw":             [9],
-    "gcc":               [9],
-    "vs-context-menu":   [1, 11, 10],
-    "vscontextmenu":     [1, 11, 10],
-    "context-menu":      [1, 11, 10],
-    "contextmenu":       [1, 11, 10],
-    "vscode-context-menu": [1, 11, 10],
-    "vscodecontextmenu": [1, 11, 10],
-    "vscode+context":    [1, 11, 10],
-    "vscode+menu":       [1, 11, 10],
-    "vs-settings-sync":  [1, 11],
-    "vssettingssync":    [1, 11],
-    "vs-setting-sync":   [1, 11],
-    "vssettingsync":     [1, 11],
-    "settings-sync":     [1, 11],
-    "settingssync":      [1, 11],
-    "vscode-settings":   [1, 11],
-    "vscodesettings":    [1, 11],
-    "all-dev":           [12],
-    "alldev":            [12],
-    "all":               [12],
-    "audit":             [13],
-    "winget":            [14],
-    "tweaks":            [15],
-    "windows-tweaks":    [15],
-    "windowstweaks":     [15],
-    "php":               [16],
-    "phpmyadmin":        [16],
-    "php+phpmyadmin":    [16],
-    "php-only":          [16],
-    "phpmyadmin-only":   [16],
-    "powershell":        [17],
-    "pwsh":              [17],
-    "mysql":             [18],
-    "mariadb":           [19],
-    "postgresql":        [20],
-    "postgres":          [20],
-    "psql":              [20],
-    "sqlite":            [21],
-    "mongodb":           [22],
-    "mongo":             [22],
-    "couchdb":           [23],
-    "redis":             [24],
-    "cache":             [24],
-    "key-value":         [24],
-    "cassandra":         [25],
-    "neo4j":             [26],
-    "elasticsearch":     [27],
-    "duckdb":            [28],
-    "litedb":            [29],
-    "databases":         [30],
-    "db":                [30],
-    "pwsh-menu":         [17, 31],
-    "pwsh-context-menu": [17, 31],
-    "ps-context-menu":   [17, 31],
-    "powershell-context-menu": [17, 31],
-    "powershell-menu":   [17, 31],
-    "pwsh+menu":         [17, 31],
-    "context-menu-bundle": [57],
-    "menus-repair":      [57],
-    "fix-menus":         [57],
-    "dbeaver":           [32],
-    "db-viewer":         [32],
-    "dbviewer":          [32],
-    "dbeaver+settings":  [32],
-    "dbeaver-settings":  [32],
-    "install-dbeaver":   [32],
-    "notepad++":         [33],
-    "notepadpp":         [33],
-    "notepad-plus":      [33],
-    "npp":               [33],
-    "npp+settings":      [33],
-    "npp-settings":      [33],
-    "install-npp":       [33],
-    "health":            [13],
-    "health-check":      [13],
-    "healthcheck":       [13],
-    "gitmap":            [35],
-    "git-map":           [35],
-    "sticky-notes":      [34],
-    "stickynotes":       [34],
-    "sticky":            [34],
-    "ssn":               [34],
-    "obs":               [36],
-    "obs-studio":        [36],
-    "obs+settings":      [36],
-    "obs-settings":      [36],
-    "install-obs":       [36],
-    "windows-terminal":  [37],
-    "wt":                [37],
-    "wt+settings":       [37],
-    "wt-settings":       [37],
-    "install-wt":        [37],
-    "flutter":           [38],
-    "dart":              [38],
-    "mobile":            [38],
-    "flutter+android":   [38],
-    "flutter-extensions":[38],
-    "flutter-doctor":    [38],
-    "install-flutter":   [38],
-    "vscode+settings":   [1, 11],
-    "vscode+s":          [1, 11],
-    "vscode+menu+settings": [1, 10, 11],
-    "vms":               [1, 10, 11],
-    "git+desktop":       [7, 8],
-    "git+gh":            [7, 8],
-    "pylibs":            [5, 41],
-    "python-libs":       [41],
-    "pip-libs":          [41],
-    "ml-libs":           [41],
-    "python-packages":   [41],
-    "jupyter":           [41],
-    "python+libs":       [5, 41],
-    "ml-dev":            [5, 41],
-    "python+pip":        [5],
-    "jupyter+libs":      [41],
-    "viz-libs":          [41],
-    "vizlibs":           [41],
-    "web-libs":          [41],
-    "weblibs":           [41],
-    "scraping-libs":     [41],
-    "scrapinglibs":      [41],
-    "db-libs":           [41],
-    "dblibs":            [41],
-    "cv-libs":           [41],
-    "cvlibs":            [41],
-    "data-libs":         [41],
-    "datalibs":          [41],
-    "jupyter-libs":      [41],
-    "python+viz":        [5, 41],
-    "python+web":        [5, 41],
-    "python+scraping":   [5, 41],
-    "python+db":         [5, 41],
-    "python+cv":         [5, 41],
-    "python+data":       [5, 41],
-    "python+ml":         [5, 41],
-    "pip+jupyter+libs":  [5, 41],
-    "python+jupyter":    [5, 41],
-    "node+pnpm":         [3, 4],
-    "web-dev":           [1, 3, 4, 7, 11],
-    "webdev":            [1, 3, 4, 7, 11],
-    "full-stack":        [1, 2, 3, 4, 5, 7, 8, 9, 11, 16, 39, 40],
-    "fullstack":         [1, 2, 3, 4, 5, 7, 8, 9, 11, 16, 39, 40],
-    "backend":           [5, 6, 16, 20, 39, 40],
-    "frontend":          [1, 3, 4, 11],
-    "essentials":        [2, 7, 58, 1, 11, 33, 48, 3],
-    "basic":             [2, 7, 58, 1, 11, 33, 48],
-    "minimal":           [2, 7, 58, 1, 11, 33, 48],
-    "chrome":            [58],
-    "google-chrome":     [58],
-    "googlechrome":      [58],
-    "browser":           [58],
-    "install-chrome":    [58],
-    "mobile-dev":        [38],
-    "mobiledev":         [38],
-    "data-dev":          [20, 24, 28, 32],
-    "datadev":           [20, 24, 28, 32],
-    "dotnet":            [39],
-    ".net":              [39],
-    "dotnet-sdk":        [39],
-    "csharp":            [39],
-    "c#":                [39],
-    "dotnet-6":          [39],
-    "dotnet-8":          [39],
-    "dotnet-9":          [39],
-    "java":              [40],
-    "openjdk":           [40],
-    "jdk":               [40],
-    "jre":               [40],
-    "jdk-17":            [40],
-    "jdk-21":            [40],
-    "data-science":      [5, 41],
-    "datascience":       [5, 41],
-    "ai-dev":            [5, 41],
-    "aidev":             [5, 41],
-    "deep-learning":     [5, 41],
-    "ml-full":           [5, 41],
-    "ollama":            [42],
-    "local-llm":         [42],
-    "llm":               [42],
-    "llama-cpp":         [43],
-    "llamacpp":          [43],
-    "llama":             [43],
-    "llama.cpp":         [43],
-    "koboldcpp":         [43],
-    "kobold":            [43],
-    "gguf":              [43],
-    "ai-tools":          [42, 43],
-    "aitools":           [42, 43],
-    "local-ai":          [42, 43],
-    "localai":           [42, 43],
-    "ollama+llama":      [42, 43],
-    "ollama-models":     [42],
-    "llama-models":      [43],
-    "ai-full":           [5, 41, 42, 43],
-    "aifull":            [5, 41, 42, 43],
-    "rust":              [44],
-    "rustup":            [44],
-    "cargo":             [44],
-    "rustlang":          [44],
-    "docker":            [45],
-    "docker-desktop":    [45],
-    "containers":        [45],
-    "kubernetes":        [46],
-    "kubectl":           [46],
-    "k8s":               [46],
-    "minikube":          [46],
-    "helm":              [46],
-    "devops":            [7, 45, 46],
-    "container-dev":     [45, 46],
-    "containerdev":      [45, 46],
-    "systems-dev":       [9, 44],
-    "systemsdev":        [9, 44],
-    "ubuntu-font":       [47],
-    "ubuntu.font":       [47],
-    "ubuntufont":        [47],
-    "conemu":            [48],
-    "conemu+settings":   [48],
-    "conemu-settings":   [48],
-    "install-conemu":    [48],
-    "all-settings":      [1, 11, 32, 33, 36, 37, 48],
-    "allsettings":       [1, 11, 32, 33, 36, 37, 48],
-    "all+settings":      [1, 11, 32, 33, 36, 37, 48],
-    "settings-all":      [1, 11, 32, 33, 36, 37, 48],
-    "settingsall":       [1, 11, 32, 33, 36, 37, 48],
-    "every-settings":    [1, 11, 32, 33, 36, 37, 48],
-    "settings":          [1, 11, 32, 33, 36, 37, 48],
-    "whatsapp":          [49],
-    "wa":                [49],
-    "onenote":           [50],
-    "one-note":          [50],
-    "onenote+rm-onedrive": [50],
-    "onenote-rm-onedrive": [50],
-    "onenote+onedrive-off": [50],
-    "onenote+tweaks":    [50],
-    "lightshot":         [51],
-    "screenshot-tool":   [51],
-    "clean-code":        ["remote:clean-code"],
-    "code-guide":        ["remote:clean-code"],
-    "cg":                ["remote:clean-code"],
-    "cc":                ["remote:clean-code"],
-    "coding-guidelines": ["remote:clean-code"],
-    "starship":          ["remote:starship"],
-    "starship-prompt":   ["remote:starship"],
-    "ss":                ["remote:starship"],
-    "oh-my-posh":        ["remote:oh-my-posh"],
-    "ohmyposh":          ["remote:oh-my-posh"],
-    "omp":               ["remote:oh-my-posh"],
-    "posh":              ["remote:oh-my-posh"],
-    "scoop":             ["remote:scoop"],
-    "scoop-installer":   ["remote:scoop"],
-    "sc":                ["remote:scoop"],
-    "os-clean":          ["os:clean"],
-    "osclean":           ["os:clean"],
-    "os-hib-off":        ["os:hib-off"],
-    "hib-off":           ["os:hib-off"],
-    "hibernate-off":     ["os:hib-off"],
-    "no-hibernate":      ["os:hib-off"],
-    "os-flp":            ["os:flp"],
-    "flp":               ["os:flp"],
-    "fix-long-path":     ["os:flp"],
-    "long-path":         ["os:flp"],
-    "longpath":          ["os:flp"],
-    "os-add-user":       ["os:add-user"],
-    "add-user":          ["os:add-user"],
-    "adduser":           ["os:add-user"],
-    "new-user":          ["os:add-user"],
-    "profile-minimal":   ["profile:minimal"],
-    "profile-base":      ["profile:base"],
-    "profile-git":       ["profile:git-compact"],
-    "profile-git-compact": ["profile:git-compact"],
-    "profile-advance":   ["profile:advance"],
-    "profile-advanced":  ["profile:advance"],
-    "profile-cpp-dx":    ["profile:cpp-dx"],
-    "profile-cppdx":     ["profile:cpp-dx"],
-    "profile-small-dev": ["profile:small-dev"],
-    "profile-smalldev":  ["profile:small-dev"],
-    "profile-dev":       ["profile:dev"],
-    "profile-dev-advance":  ["profile:dev-advance"],
-    "profile-devadvance":   ["profile:dev-advance"],
-    "profile-dev-advanced": ["profile:dev-advance"]
+    "vscode": [
+      1
+    ],
+    "vs-code": [
+      1
+    ],
+    "code": [
+      1
+    ],
+    "choco": [
+      2
+    ],
+    "chocolatey": [
+      2
+    ],
+    "package-managers": [
+      2
+    ],
+    "packagemanagers": [
+      2
+    ],
+    "nodejs": [
+      3
+    ],
+    "node": [
+      3
+    ],
+    "node.js": [
+      3
+    ],
+    "yarn": [
+      3
+    ],
+    "bun": [
+      3
+    ],
+    "pnpm": [
+      3,
+      4
+    ],
+    "python": [
+      5
+    ],
+    "pip": [
+      5
+    ],
+    "python-pip": [
+      5
+    ],
+    "pythonpip": [
+      5
+    ],
+    "go": [
+      6
+    ],
+    "golang": [
+      6
+    ],
+    "git": [
+      7
+    ],
+    "git-lfs": [
+      7
+    ],
+    "gitlfs": [
+      7
+    ],
+    "gh": [
+      7
+    ],
+    "github-cli": [
+      7
+    ],
+    "githubcli": [
+      7
+    ],
+    "github-desktop": [
+      8
+    ],
+    "githubdesktop": [
+      8
+    ],
+    "cpp": [
+      9
+    ],
+    "c++": [
+      9
+    ],
+    "mingw": [
+      9
+    ],
+    "gcc": [
+      9
+    ],
+    "vs-context-menu": [
+      1,
+      11,
+      10
+    ],
+    "vscontextmenu": [
+      1,
+      11,
+      10
+    ],
+    "context-menu": [
+      1,
+      11,
+      10
+    ],
+    "contextmenu": [
+      1,
+      11,
+      10
+    ],
+    "vscode-context-menu": [
+      1,
+      11,
+      10
+    ],
+    "vscodecontextmenu": [
+      1,
+      11,
+      10
+    ],
+    "vscode+context": [
+      1,
+      11,
+      10
+    ],
+    "vscode+menu": [
+      1,
+      11,
+      10
+    ],
+    "vs-settings-sync": [
+      1,
+      11
+    ],
+    "vssettingssync": [
+      1,
+      11
+    ],
+    "vs-setting-sync": [
+      1,
+      11
+    ],
+    "vssettingsync": [
+      1,
+      11
+    ],
+    "settings-sync": [
+      1,
+      11
+    ],
+    "settingssync": [
+      1,
+      11
+    ],
+    "vscode-settings": [
+      1,
+      11
+    ],
+    "vscodesettings": [
+      1,
+      11
+    ],
+    "all-dev": [
+      12
+    ],
+    "alldev": [
+      12
+    ],
+    "all": [
+      12
+    ],
+    "audit": [
+      13
+    ],
+    "winget": [
+      14
+    ],
+    "tweaks": [
+      15
+    ],
+    "windows-tweaks": [
+      15
+    ],
+    "windowstweaks": [
+      15
+    ],
+    "php": [
+      16
+    ],
+    "phpmyadmin": [
+      16
+    ],
+    "php+phpmyadmin": [
+      16
+    ],
+    "php-only": [
+      16
+    ],
+    "phpmyadmin-only": [
+      16
+    ],
+    "powershell": [
+      17
+    ],
+    "pwsh": [
+      17
+    ],
+    "mysql": [
+      18
+    ],
+    "mariadb": [
+      19
+    ],
+    "postgresql": [
+      20
+    ],
+    "postgres": [
+      20
+    ],
+    "psql": [
+      20
+    ],
+    "sqlite": [
+      21
+    ],
+    "mongodb": [
+      22
+    ],
+    "mongo": [
+      22
+    ],
+    "couchdb": [
+      23
+    ],
+    "redis": [
+      24
+    ],
+    "cache": [
+      24
+    ],
+    "key-value": [
+      24
+    ],
+    "cassandra": [
+      25
+    ],
+    "neo4j": [
+      26
+    ],
+    "elasticsearch": [
+      27
+    ],
+    "duckdb": [
+      28
+    ],
+    "litedb": [
+      29
+    ],
+    "databases": [
+      30
+    ],
+    "db": [
+      30
+    ],
+    "pwsh-menu": [
+      17,
+      31
+    ],
+    "pwsh-context-menu": [
+      17,
+      31
+    ],
+    "ps-context-menu": [
+      17,
+      31
+    ],
+    "powershell-context-menu": [
+      17,
+      31
+    ],
+    "powershell-menu": [
+      17,
+      31
+    ],
+    "pwsh+menu": [
+      17,
+      31
+    ],
+    "conemu-menu": [
+      48,
+      59
+    ],
+    "conemu-context-menu": [
+      48,
+      59
+    ],
+    "conemu+menu": [
+      48,
+      59
+    ],
+    "context-menu-bundle": [
+      57
+    ],
+    "menus-repair": [
+      57
+    ],
+    "fix-menus": [
+      57
+    ],
+    "dbeaver": [
+      32
+    ],
+    "db-viewer": [
+      32
+    ],
+    "dbviewer": [
+      32
+    ],
+    "dbeaver+settings": [
+      32
+    ],
+    "dbeaver-settings": [
+      32
+    ],
+    "install-dbeaver": [
+      32
+    ],
+    "notepad++": [
+      33
+    ],
+    "notepadpp": [
+      33
+    ],
+    "notepad-plus": [
+      33
+    ],
+    "npp": [
+      33
+    ],
+    "npp+settings": [
+      33
+    ],
+    "npp-settings": [
+      33
+    ],
+    "install-npp": [
+      33
+    ],
+    "health": [
+      13
+    ],
+    "health-check": [
+      13
+    ],
+    "healthcheck": [
+      13
+    ],
+    "gitmap": [
+      35
+    ],
+    "git-map": [
+      35
+    ],
+    "sticky-notes": [
+      34
+    ],
+    "stickynotes": [
+      34
+    ],
+    "sticky": [
+      34
+    ],
+    "ssn": [
+      34
+    ],
+    "obs": [
+      36
+    ],
+    "obs-studio": [
+      36
+    ],
+    "obs+settings": [
+      36
+    ],
+    "obs-settings": [
+      36
+    ],
+    "install-obs": [
+      36
+    ],
+    "windows-terminal": [
+      37
+    ],
+    "wt": [
+      37
+    ],
+    "wt+settings": [
+      37
+    ],
+    "wt-settings": [
+      37
+    ],
+    "install-wt": [
+      37
+    ],
+    "flutter": [
+      38
+    ],
+    "dart": [
+      38
+    ],
+    "mobile": [
+      38
+    ],
+    "flutter+android": [
+      38
+    ],
+    "flutter-extensions": [
+      38
+    ],
+    "flutter-doctor": [
+      38
+    ],
+    "install-flutter": [
+      38
+    ],
+    "vscode+settings": [
+      1,
+      11
+    ],
+    "vscode+s": [
+      1,
+      11
+    ],
+    "vscode+menu+settings": [
+      1,
+      10,
+      11
+    ],
+    "vms": [
+      1,
+      10,
+      11
+    ],
+    "git+desktop": [
+      7,
+      8
+    ],
+    "git+gh": [
+      7,
+      8
+    ],
+    "pylibs": [
+      5,
+      41
+    ],
+    "python-libs": [
+      41
+    ],
+    "pip-libs": [
+      41
+    ],
+    "ml-libs": [
+      41
+    ],
+    "python-packages": [
+      41
+    ],
+    "jupyter": [
+      41
+    ],
+    "python+libs": [
+      5,
+      41
+    ],
+    "ml-dev": [
+      5,
+      41
+    ],
+    "python+pip": [
+      5
+    ],
+    "jupyter+libs": [
+      41
+    ],
+    "viz-libs": [
+      41
+    ],
+    "vizlibs": [
+      41
+    ],
+    "web-libs": [
+      41
+    ],
+    "weblibs": [
+      41
+    ],
+    "scraping-libs": [
+      41
+    ],
+    "scrapinglibs": [
+      41
+    ],
+    "db-libs": [
+      41
+    ],
+    "dblibs": [
+      41
+    ],
+    "cv-libs": [
+      41
+    ],
+    "cvlibs": [
+      41
+    ],
+    "data-libs": [
+      41
+    ],
+    "datalibs": [
+      41
+    ],
+    "jupyter-libs": [
+      41
+    ],
+    "python+viz": [
+      5,
+      41
+    ],
+    "python+web": [
+      5,
+      41
+    ],
+    "python+scraping": [
+      5,
+      41
+    ],
+    "python+db": [
+      5,
+      41
+    ],
+    "python+cv": [
+      5,
+      41
+    ],
+    "python+data": [
+      5,
+      41
+    ],
+    "python+ml": [
+      5,
+      41
+    ],
+    "pip+jupyter+libs": [
+      5,
+      41
+    ],
+    "python+jupyter": [
+      5,
+      41
+    ],
+    "node+pnpm": [
+      3,
+      4
+    ],
+    "web-dev": [
+      1,
+      3,
+      4,
+      7,
+      11
+    ],
+    "webdev": [
+      1,
+      3,
+      4,
+      7,
+      11
+    ],
+    "full-stack": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      16,
+      39,
+      40
+    ],
+    "fullstack": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      16,
+      39,
+      40
+    ],
+    "backend": [
+      5,
+      6,
+      16,
+      20,
+      39,
+      40
+    ],
+    "frontend": [
+      1,
+      3,
+      4,
+      11
+    ],
+    "essentials": [
+      2,
+      7,
+      58,
+      1,
+      11,
+      33,
+      48,
+      3
+    ],
+    "basic": [
+      2,
+      7,
+      58,
+      1,
+      11,
+      33,
+      48
+    ],
+    "minimal": [
+      2,
+      7,
+      58,
+      1,
+      11,
+      33,
+      48
+    ],
+    "chrome": [
+      58
+    ],
+    "google-chrome": [
+      58
+    ],
+    "googlechrome": [
+      58
+    ],
+    "browser": [
+      58
+    ],
+    "install-chrome": [
+      58
+    ],
+    "mobile-dev": [
+      38
+    ],
+    "mobiledev": [
+      38
+    ],
+    "data-dev": [
+      20,
+      24,
+      28,
+      32
+    ],
+    "datadev": [
+      20,
+      24,
+      28,
+      32
+    ],
+    "dotnet": [
+      39
+    ],
+    ".net": [
+      39
+    ],
+    "dotnet-sdk": [
+      39
+    ],
+    "csharp": [
+      39
+    ],
+    "c#": [
+      39
+    ],
+    "dotnet-6": [
+      39
+    ],
+    "dotnet-8": [
+      39
+    ],
+    "dotnet-9": [
+      39
+    ],
+    "java": [
+      40
+    ],
+    "openjdk": [
+      40
+    ],
+    "jdk": [
+      40
+    ],
+    "jre": [
+      40
+    ],
+    "jdk-17": [
+      40
+    ],
+    "jdk-21": [
+      40
+    ],
+    "data-science": [
+      5,
+      41
+    ],
+    "datascience": [
+      5,
+      41
+    ],
+    "ai-dev": [
+      5,
+      41
+    ],
+    "aidev": [
+      5,
+      41
+    ],
+    "deep-learning": [
+      5,
+      41
+    ],
+    "ml-full": [
+      5,
+      41
+    ],
+    "ollama": [
+      42
+    ],
+    "local-llm": [
+      42
+    ],
+    "llm": [
+      42
+    ],
+    "llama-cpp": [
+      43
+    ],
+    "llamacpp": [
+      43
+    ],
+    "llama": [
+      43
+    ],
+    "llama.cpp": [
+      43
+    ],
+    "koboldcpp": [
+      43
+    ],
+    "kobold": [
+      43
+    ],
+    "gguf": [
+      43
+    ],
+    "ai-tools": [
+      42,
+      43
+    ],
+    "aitools": [
+      42,
+      43
+    ],
+    "local-ai": [
+      42,
+      43
+    ],
+    "localai": [
+      42,
+      43
+    ],
+    "ollama+llama": [
+      42,
+      43
+    ],
+    "ollama-models": [
+      42
+    ],
+    "llama-models": [
+      43
+    ],
+    "ai-full": [
+      5,
+      41,
+      42,
+      43
+    ],
+    "aifull": [
+      5,
+      41,
+      42,
+      43
+    ],
+    "rust": [
+      44
+    ],
+    "rustup": [
+      44
+    ],
+    "cargo": [
+      44
+    ],
+    "rustlang": [
+      44
+    ],
+    "docker": [
+      45
+    ],
+    "docker-desktop": [
+      45
+    ],
+    "containers": [
+      45
+    ],
+    "kubernetes": [
+      46
+    ],
+    "kubectl": [
+      46
+    ],
+    "k8s": [
+      46
+    ],
+    "minikube": [
+      46
+    ],
+    "helm": [
+      46
+    ],
+    "devops": [
+      7,
+      45,
+      46
+    ],
+    "container-dev": [
+      45,
+      46
+    ],
+    "containerdev": [
+      45,
+      46
+    ],
+    "systems-dev": [
+      9,
+      44
+    ],
+    "systemsdev": [
+      9,
+      44
+    ],
+    "ubuntu-font": [
+      47
+    ],
+    "ubuntu.font": [
+      47
+    ],
+    "ubuntufont": [
+      47
+    ],
+    "conemu": [
+      48,
+      59
+    ],
+    "conemu+settings": [
+      48,
+      59
+    ],
+    "conemu-settings": [
+      48
+    ],
+    "install-conemu": [
+      48,
+      59
+    ],
+    "all-settings": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48,
+      59
+    ],
+    "allsettings": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48,
+      59
+    ],
+    "all+settings": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48,
+      59
+    ],
+    "settings-all": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48,
+      59
+    ],
+    "settingsall": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48
+    ],
+    "every-settings": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48
+    ],
+    "settings": [
+      1,
+      11,
+      32,
+      33,
+      36,
+      37,
+      48
+    ],
+    "whatsapp": [
+      49
+    ],
+    "wa": [
+      49
+    ],
+    "onenote": [
+      50
+    ],
+    "one-note": [
+      50
+    ],
+    "onenote+rm-onedrive": [
+      50
+    ],
+    "onenote-rm-onedrive": [
+      50
+    ],
+    "onenote+onedrive-off": [
+      50
+    ],
+    "onenote+tweaks": [
+      50
+    ],
+    "lightshot": [
+      51
+    ],
+    "screenshot-tool": [
+      51
+    ],
+    "clean-code": [
+      "remote:clean-code"
+    ],
+    "code-guide": [
+      "remote:clean-code"
+    ],
+    "cg": [
+      "remote:clean-code"
+    ],
+    "cc": [
+      "remote:clean-code"
+    ],
+    "coding-guidelines": [
+      "remote:clean-code"
+    ],
+    "starship": [
+      "remote:starship"
+    ],
+    "starship-prompt": [
+      "remote:starship"
+    ],
+    "ss": [
+      "remote:starship"
+    ],
+    "oh-my-posh": [
+      "remote:oh-my-posh"
+    ],
+    "ohmyposh": [
+      "remote:oh-my-posh"
+    ],
+    "omp": [
+      "remote:oh-my-posh"
+    ],
+    "posh": [
+      "remote:oh-my-posh"
+    ],
+    "scoop": [
+      "remote:scoop"
+    ],
+    "scoop-installer": [
+      "remote:scoop"
+    ],
+    "sc": [
+      "remote:scoop"
+    ],
+    "os-clean": [
+      "os:clean"
+    ],
+    "osclean": [
+      "os:clean"
+    ],
+    "os-hib-off": [
+      "os:hib-off"
+    ],
+    "hib-off": [
+      "os:hib-off"
+    ],
+    "hibernate-off": [
+      "os:hib-off"
+    ],
+    "no-hibernate": [
+      "os:hib-off"
+    ],
+    "os-flp": [
+      "os:flp"
+    ],
+    "flp": [
+      "os:flp"
+    ],
+    "fix-long-path": [
+      "os:flp"
+    ],
+    "long-path": [
+      "os:flp"
+    ],
+    "longpath": [
+      "os:flp"
+    ],
+    "os-add-user": [
+      "os:add-user"
+    ],
+    "add-user": [
+      "os:add-user"
+    ],
+    "adduser": [
+      "os:add-user"
+    ],
+    "new-user": [
+      "os:add-user"
+    ],
+    "profile-minimal": [
+      "profile:minimal"
+    ],
+    "profile-base": [
+      "profile:base"
+    ],
+    "profile-git": [
+      "profile:git-compact"
+    ],
+    "profile-git-compact": [
+      "profile:git-compact"
+    ],
+    "profile-advance": [
+      "profile:advance"
+    ],
+    "profile-advanced": [
+      "profile:advance"
+    ],
+    "profile-cpp-dx": [
+      "profile:cpp-dx"
+    ],
+    "profile-cppdx": [
+      "profile:cpp-dx"
+    ],
+    "profile-small-dev": [
+      "profile:small-dev"
+    ],
+    "profile-smalldev": [
+      "profile:small-dev"
+    ],
+    "profile-dev": [
+      "profile:dev"
+    ],
+    "profile-dev-advance": [
+      "profile:dev-advance"
+    ],
+    "profile-devadvance": [
+      "profile:dev-advance"
+    ],
+    "profile-dev-advanced": [
+      "profile:dev-advance"
+    ]
   },
   "modes": {
-    "notepad++":         { "33": "install+settings" },
-    "notepadpp":         { "33": "install+settings" },
-    "notepad-plus":      { "33": "install+settings" },
-    "npp":               { "33": "install+settings" },
-    "npp+settings":      { "33": "install+settings" },
-    "npp-settings":      { "33": "settings-only" },
-    "install-npp":       { "33": "install-only" },
-    "php":               { "16": "php+phpmyadmin" },
-    "php+phpmyadmin":    { "16": "php+phpmyadmin" },
-    "phpmyadmin":        { "16": "phpmyadmin-only" },
-    "php-only":          { "16": "php-only" },
-    "phpmyadmin-only":   { "16": "phpmyadmin-only" },
-    "obs":               { "36": "install+settings" },
-    "obs-studio":        { "36": "install+settings" },
-    "obs+settings":      { "36": "install+settings" },
-    "obs-settings":      { "36": "settings-only" },
-    "install-obs":       { "36": "install-only" },
-    "windows-terminal":  { "37": "install+settings" },
-    "wt":                { "37": "install+settings" },
-    "wt+settings":       { "37": "install+settings" },
-    "wt-settings":       { "37": "settings-only" },
-    "install-wt":        { "37": "install-only" },
-    "dbeaver":           { "32": "install+settings" },
-    "db-viewer":         { "32": "install+settings" },
-    "dbviewer":          { "32": "install+settings" },
-    "dbeaver+settings":  { "32": "install+settings" },
-    "dbeaver-settings":  { "32": "settings-only" },
-    "install-dbeaver":   { "32": "install-only" },
-    "flutter":           { "38": "install" },
-    "dart":              { "38": "install" },
-    "mobile":            { "38": "install" },
-    "flutter+android":   { "38": "android" },
-    "flutter-extensions":{ "38": "extensions" },
-    "flutter-doctor":    { "38": "doctor" },
-    "install-flutter":   { "38": "install" },
-    "dotnet-6":          { "39": "install 6" },
-    "dotnet-8":          { "39": "install 8" },
-    "dotnet-9":          { "39": "install 9" },
-    "jdk-17":            { "40": "install 17" },
-    "jdk-21":            { "40": "install 21" },
-    "jupyter+libs":      { "41": "group jupyter" },
-    "viz-libs":          { "41": "group viz" },
-    "vizlibs":           { "41": "group viz" },
-    "web-libs":          { "41": "group web" },
-    "weblibs":           { "41": "group web" },
-    "scraping-libs":     { "41": "group scraping" },
-    "scrapinglibs":      { "41": "group scraping" },
-    "db-libs":           { "41": "group db" },
-    "dblibs":            { "41": "group db" },
-    "cv-libs":           { "41": "group cv" },
-    "cvlibs":            { "41": "group cv" },
-    "data-libs":         { "41": "group data" },
-    "datalibs":          { "41": "group data" },
-    "jupyter-libs":      { "41": "group jupyter" },
-    "python+viz":        { "41": "group viz" },
-    "python+web":        { "41": "group web" },
-    "python+scraping":   { "41": "group scraping" },
-    "python+db":         { "41": "group db" },
-    "python+cv":         { "41": "group cv" },
-    "python+data":       { "41": "group data" },
-    "python+ml":         { "41": "group ml" },
-    "data-science":      { "41": "group data" },
-    "datascience":       { "41": "group data" },
-    "ai-dev":            { "41": "group ml" },
-    "aidev":             { "41": "group ml" },
-    "deep-learning":     { "41": "group ml" },
-    "ml-full":           { "41": "group ml" },
-    "ollama-models":     { "42": "models" },
-    "llama-models":      { "43": "models" },
-    "conemu":            { "48": "install+settings" },
-    "conemu+settings":   { "48": "install+settings" },
-    "conemu-settings":   { "48": "settings-only" },
-    "install-conemu":    { "48": "install-only" },
-    "basic":             { "33": "install+settings", "48": "install+settings" },
-    "minimal":           { "33": "install+settings", "48": "install+settings" },
-    "essentials":        { "33": "install+settings", "48": "install+settings" },
-    "all-settings":      { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "allsettings":       { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "all+settings":      { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "settings-all":      { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "settingsall":       { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "every-settings":    { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "settings":          { "32": "install+settings", "33": "install+settings", "36": "install+settings", "37": "install+settings", "48": "install+settings" },
-    "onenote":               { "50": "install" },
-    "one-note":              { "50": "install" },
-    "onenote+rm-onedrive":   { "50": "with-tweaks" },
-    "onenote-rm-onedrive":   { "50": "with-tweaks" },
-    "onenote+onedrive-off":  { "50": "with-tweaks" },
-    "onenote+tweaks":        { "50": "with-tweaks" }
+    "notepad++": {
+      "33": "install+settings"
+    },
+    "notepadpp": {
+      "33": "install+settings"
+    },
+    "notepad-plus": {
+      "33": "install+settings"
+    },
+    "npp": {
+      "33": "install+settings"
+    },
+    "npp+settings": {
+      "33": "install+settings"
+    },
+    "npp-settings": {
+      "33": "settings-only"
+    },
+    "install-npp": {
+      "33": "install-only"
+    },
+    "php": {
+      "16": "php+phpmyadmin"
+    },
+    "php+phpmyadmin": {
+      "16": "php+phpmyadmin"
+    },
+    "phpmyadmin": {
+      "16": "phpmyadmin-only"
+    },
+    "php-only": {
+      "16": "php-only"
+    },
+    "phpmyadmin-only": {
+      "16": "phpmyadmin-only"
+    },
+    "obs": {
+      "36": "install+settings"
+    },
+    "obs-studio": {
+      "36": "install+settings"
+    },
+    "obs+settings": {
+      "36": "install+settings"
+    },
+    "obs-settings": {
+      "36": "settings-only"
+    },
+    "install-obs": {
+      "36": "install-only"
+    },
+    "windows-terminal": {
+      "37": "install+settings"
+    },
+    "wt": {
+      "37": "install+settings"
+    },
+    "wt+settings": {
+      "37": "install+settings"
+    },
+    "wt-settings": {
+      "37": "settings-only"
+    },
+    "install-wt": {
+      "37": "install-only"
+    },
+    "dbeaver": {
+      "32": "install+settings"
+    },
+    "db-viewer": {
+      "32": "install+settings"
+    },
+    "dbviewer": {
+      "32": "install+settings"
+    },
+    "dbeaver+settings": {
+      "32": "install+settings"
+    },
+    "dbeaver-settings": {
+      "32": "settings-only"
+    },
+    "install-dbeaver": {
+      "32": "install-only"
+    },
+    "flutter": {
+      "38": "install"
+    },
+    "dart": {
+      "38": "install"
+    },
+    "mobile": {
+      "38": "install"
+    },
+    "flutter+android": {
+      "38": "android"
+    },
+    "flutter-extensions": {
+      "38": "extensions"
+    },
+    "flutter-doctor": {
+      "38": "doctor"
+    },
+    "install-flutter": {
+      "38": "install"
+    },
+    "dotnet-6": {
+      "39": "install 6"
+    },
+    "dotnet-8": {
+      "39": "install 8"
+    },
+    "dotnet-9": {
+      "39": "install 9"
+    },
+    "jdk-17": {
+      "40": "install 17"
+    },
+    "jdk-21": {
+      "40": "install 21"
+    },
+    "jupyter+libs": {
+      "41": "group jupyter"
+    },
+    "viz-libs": {
+      "41": "group viz"
+    },
+    "vizlibs": {
+      "41": "group viz"
+    },
+    "web-libs": {
+      "41": "group web"
+    },
+    "weblibs": {
+      "41": "group web"
+    },
+    "scraping-libs": {
+      "41": "group scraping"
+    },
+    "scrapinglibs": {
+      "41": "group scraping"
+    },
+    "db-libs": {
+      "41": "group db"
+    },
+    "dblibs": {
+      "41": "group db"
+    },
+    "cv-libs": {
+      "41": "group cv"
+    },
+    "cvlibs": {
+      "41": "group cv"
+    },
+    "data-libs": {
+      "41": "group data"
+    },
+    "datalibs": {
+      "41": "group data"
+    },
+    "jupyter-libs": {
+      "41": "group jupyter"
+    },
+    "python+viz": {
+      "41": "group viz"
+    },
+    "python+web": {
+      "41": "group web"
+    },
+    "python+scraping": {
+      "41": "group scraping"
+    },
+    "python+db": {
+      "41": "group db"
+    },
+    "python+cv": {
+      "41": "group cv"
+    },
+    "python+data": {
+      "41": "group data"
+    },
+    "python+ml": {
+      "41": "group ml"
+    },
+    "data-science": {
+      "41": "group data"
+    },
+    "datascience": {
+      "41": "group data"
+    },
+    "ai-dev": {
+      "41": "group ml"
+    },
+    "aidev": {
+      "41": "group ml"
+    },
+    "deep-learning": {
+      "41": "group ml"
+    },
+    "ml-full": {
+      "41": "group ml"
+    },
+    "ollama-models": {
+      "42": "models"
+    },
+    "llama-models": {
+      "43": "models"
+    },
+    "conemu": {
+      "48": "install+settings"
+    },
+    "conemu+settings": {
+      "48": "install+settings"
+    },
+    "conemu-settings": {
+      "48": "settings-only"
+    },
+    "install-conemu": {
+      "48": "install-only"
+    },
+    "basic": {
+      "33": "install+settings",
+      "48": "install+settings"
+    },
+    "minimal": {
+      "33": "install+settings",
+      "48": "install+settings"
+    },
+    "essentials": {
+      "33": "install+settings",
+      "48": "install+settings"
+    },
+    "all-settings": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "allsettings": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "all+settings": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "settings-all": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "settingsall": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "every-settings": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "settings": {
+      "32": "install+settings",
+      "33": "install+settings",
+      "36": "install+settings",
+      "37": "install+settings",
+      "48": "install+settings"
+    },
+    "onenote": {
+      "50": "install"
+    },
+    "one-note": {
+      "50": "install"
+    },
+    "onenote+rm-onedrive": {
+      "50": "with-tweaks"
+    },
+    "onenote-rm-onedrive": {
+      "50": "with-tweaks"
+    },
+    "onenote+onedrive-off": {
+      "50": "with-tweaks"
+    },
+    "onenote+tweaks": {
+      "50": "with-tweaks"
+    }
   },
   "_remoteComment": "Maps remote:<key> entries to the body streamed via 'irm <url> | iex' (or read from disk when 'path' is present, v0.47.1+). Used by 'install clean-code' / 'install starship' / 'install oh-my-posh' / 'install scoop' etc. Each entry MUST have either 'url' (HTTP) or 'path' (repo-relative) and MAY include an optional 'sha256': '<lowercase-hex>' field; when present, run.ps1 hashes the body BEFORE Invoke-Expression and refuses to execute on mismatch (CODE RED integrity guard, v0.45.2+).",
   "_pinMaintenanceNote": "How to refresh the SHA256 pins (do this whenever an upstream installer publishes a new release, or at least quarterly): (1) Download the body fresh: 'curl -fsSL <remote.<key>.url> -o /tmp/<key>.ps1'. (2) Compute the hash exactly the way run.ps1 does -- UTF-8 bytes of the decoded text body: PowerShell -> '[System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes((Invoke-WebRequest <url>).Content)) | ForEach-Object {$_.ToString(\"x2\")} -join \"\"'. (3) Paste the lowercase hex into the matching 'remote.<key>.sha256' field below. (4) Bump version.json (patch). (5) Run '.\\run.ps1 doctor --self-check' to confirm pins resolve. NEVER commit a hash you didn't verify in the same session -- a stale or guessed hash will make CODE RED refuse every future run of that installer.",
@@ -410,23 +1438,23 @@
   "_pathComment": "A remote.<key> entry MAY use 'path' (repo-relative) instead of 'url' to point at a wrapper script checked into THIS repo. The dispatcher loads the body from disk via the local path; the SHA256 pin is still enforced exactly the same way (UTF-8 bytes of the body). Use this when the upstream URL is unreliable (404, takedown, censored region) or when a curated wrapper is preferable to streaming third-party code.",
   "remote": {
     "clean-code": {
-      "url":    "https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1",
-      "label":  "Coding Guidelines v15 (clean-code)",
+      "url": "https://raw.githubusercontent.com/alimtvnetwork/coding-guidelines-v15/main/install.ps1",
+      "label": "Coding Guidelines v15 (clean-code)",
       "sha256": "c045f55132171ba170c60af0d3b1671059c571bfcc293a7674c2e6a2635b8c42"
     },
     "starship": {
-      "path":   "scripts/shared/remote-installers/starship.ps1",
-      "label":  "Starship cross-shell prompt (local wrapper -- winget -> scoop -> cargo)",
+      "path": "scripts/shared/remote-installers/starship.ps1",
+      "label": "Starship cross-shell prompt (local wrapper -- winget -> scoop -> cargo)",
       "sha256": "1315b9372510257bad6c5b823c4101f71abd0f4a4d8004f5f15b35076e7a9959"
     },
     "oh-my-posh": {
-      "url":    "https://ohmyposh.dev/install.ps1",
-      "label":  "Oh My Posh prompt theming engine",
+      "url": "https://ohmyposh.dev/install.ps1",
+      "label": "Oh My Posh prompt theming engine",
       "sha256": "eae09e2ff6a7312b59507d26a5335550580fd8f8ea59334dc2a0a6026ae225ba"
     },
     "scoop": {
-      "url":    "https://get.scoop.sh",
-      "label":  "Scoop -- command-line installer for Windows",
+      "url": "https://get.scoop.sh",
+      "label": "Scoop -- command-line installer for Windows",
       "sha256": "48f6ea398b3a3fa26fae0093d37bd85b13e7eaa5d1d4a3e208408768408e35ae"
     }
   }
