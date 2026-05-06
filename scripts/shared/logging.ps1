@@ -584,30 +584,46 @@ function Import-JsonConfig {
     $isLabelMissing = -not $Label
     if ($isLabelMissing) { $Label = Split-Path -Leaf $FilePath }
 
-    # Use shared log messages if available, otherwise fall back to direct Write-Host
-    $hasSharedLogs = $null -ne $slm
-    if ($hasSharedLogs) {
-        Write-Log ($slm.messages.importLoading -replace '\{label\}', $Label -replace '\{path\}', $FilePath) -Level "info"
+    # ----------------------------------------------------------------------
+    # Defensive template lookup. The shared log-messages.json may be
+    # missing entirely, missing the .messages container, or missing one of
+    # the import* keys (e.g. when an out-of-date copy is on disk after a
+    # partial git pull, or when a caller hand-rolled $script:SharedLogMessages).
+    # In every case we fall back to a literal template so the dispatcher
+    # doesn't crash with "Cannot index into a null array" at line 590.
+    # ----------------------------------------------------------------------
+    function _ic_msg([string]$Key, [string]$Fallback) {
+        if ($null -ne $slm -and
+            $null -ne $slm.PSObject.Properties['messages'] -and
+            $null -ne $slm.messages -and
+            $null -ne $slm.messages.PSObject.Properties[$Key]) {
+            $tpl = [string]$slm.messages.$Key
+            if (-not [string]::IsNullOrWhiteSpace($tpl)) { return $tpl }
+        }
+        return $Fallback
     }
+
+    $tplLoading  = _ic_msg 'importLoading'  'Loading {label} from: {path}'
+    $tplNotFound = _ic_msg 'importNotFound' '{label} not found at path: {path}'
+    $tplSize     = _ic_msg 'importFileSize' '{label} file size: {size} chars'
+    $tplLoaded   = _ic_msg 'importLoaded'   '{label} loaded successfully'
+
+    Write-Log (($tplLoading -replace '\{label\}', $Label) -replace '\{path\}', $FilePath) -Level "info"
 
     $isFileMissing = -not (Test-Path $FilePath)
     if ($isFileMissing) {
-        Write-FileError -FilePath $FilePath -Operation "load" -Reason "File does not exist" -Module "Import-JsonConfig"
-        if ($hasSharedLogs) {
-            Write-Log ($slm.messages.importNotFound -replace '\{label\}', $Label -replace '\{path\}', $FilePath) -Level "error"
+        if (Get-Command Write-FileError -ErrorAction SilentlyContinue) {
+            Write-FileError -FilePath $FilePath -Operation "load" -Reason "File does not exist" -Module "Import-JsonConfig"
         }
+        Write-Log (($tplNotFound -replace '\{label\}', $Label) -replace '\{path\}', $FilePath) -Level "error"
         return $null
     }
 
     $content = Get-Content $FilePath -Raw
-    if ($hasSharedLogs) {
-        Write-Log ($slm.messages.importFileSize -replace '\{label\}', $Label -replace '\{size\}', $content.Length) -Level "info"
-    }
+    Write-Log (($tplSize -replace '\{label\}', $Label) -replace '\{size\}', $content.Length) -Level "info"
 
     $parsed = $content | ConvertFrom-Json
-    if ($hasSharedLogs) {
-        Write-Log ($slm.messages.importLoaded -replace '\{label\}', $Label) -Level "success"
-    }
+    Write-Log ($tplLoaded -replace '\{label\}', $Label) -Level "success"
     return $parsed
 }
 
