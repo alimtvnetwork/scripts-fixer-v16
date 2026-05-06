@@ -211,3 +211,36 @@ function Invoke-ScriptByIdSafe {
         return $false
     }
 }
+
+function Get-LastChildLogStatus {
+    <#
+    .SYNOPSIS
+        Returns the "status" field of the most recently written .logs/*.json
+        file (excluding -error.json) modified at or after $SinceUtc.
+        Used by the profile executor to detect when a child install script
+        recorded status="already-installed" so the profile step can mirror it.
+        Returns $null if no fresh log was found or it cannot be parsed.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$RootDir,
+        [Parameter(Mandatory)][datetime]$SinceUtc
+    )
+
+    $logsDir = Join-Path $RootDir ".logs"
+    if (-not (Test-Path $logsDir)) { return $null }
+
+    try {
+        $candidate = Get-ChildItem -Path $logsDir -Filter "*.json" -File -ErrorAction Stop |
+            Where-Object { $_.Name -notlike "*-error.json" -and $_.LastWriteTimeUtc -ge $SinceUtc } |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+        if (-not $candidate) { return $null }
+        $payload = Get-Content $candidate.FullName -Raw -ErrorAction Stop | ConvertFrom-Json
+        if ($payload.PSObject.Properties.Name -contains 'status') {
+            return [string]$payload.status
+        }
+    } catch {
+        return $null
+    }
+    return $null
+}
