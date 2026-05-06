@@ -87,13 +87,38 @@ function Install-WindowsTerminal {
     }
 
     # -- Verify installation -------------------------------------------
+    # Refresh PATH so newly-installed wt.exe (Chocolatey shim or WindowsApps alias) is discoverable
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
     $verifyCmd = Get-Command "wt" -ErrorAction SilentlyContinue
-    if (-not $verifyCmd) {
+    $verifiedPath = $null
+    if ($verifyCmd) {
+        $verifiedPath = $verifyCmd.Source
+    } else {
+        # Probe known install locations: Chocolatey shim, WindowsApps alias, MSIX package dir
+        $candidatePaths = @(
+            "$env:ChocolateyInstall\bin\wt.exe",
+            "$env:ProgramData\chocolatey\bin\wt.exe",
+            "$env:LOCALAPPDATA\Microsoft\WindowsApps\wt.exe"
+        )
+        $msixMatches = Get-ChildItem -Path "$env:ProgramFiles\WindowsApps" -Filter "wt.exe" -Recurse -ErrorAction SilentlyContinue |
+                       Where-Object { $_.FullName -match 'Microsoft\.WindowsTerminal_' } |
+                       Select-Object -First 1
+        if ($msixMatches) { $candidatePaths += $msixMatches.FullName }
+
+        foreach ($cp in $candidatePaths) {
+            if ($cp -and (Test-Path $cp)) { $verifiedPath = $cp; break }
+        }
+    }
+
+    if (-not $verifiedPath) {
         $checkedPath = "$env:LOCALAPPDATA\Microsoft\WindowsApps\wt.exe"
-        Write-FileError -FilePath $checkedPath -Operation "resolve" -Reason "wt.exe not found after Chocolatey install" -Module "Install-WindowsTerminal"
+        Write-FileError -FilePath $checkedPath -Operation "resolve" -Reason "wt.exe not found after Chocolatey install (checked PATH, Chocolatey bin, WindowsApps alias, and Program Files\WindowsApps\Microsoft.WindowsTerminal_*)" -Module "Install-WindowsTerminal"
         Write-Log ($msgs.installFailed -replace '\{error\}', "wt.exe not found after install") -Level "error"
         return $false
     }
+
+    Write-Log "Windows Terminal verified at: $verifiedPath" -Level "info"
 
     $version = "unknown"
     try {
