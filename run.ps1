@@ -311,7 +311,7 @@ function Show-RootHelp {
     Write-Host "    $(".\run.ps1 models <ids>".PadRight($col))" -NoNewline; Write-Host "Direct install: CSV of model ids (auto-routes per backend)" -ForegroundColor DarkGray
     Write-Host "    $(".\run.ps1 models list".PadRight($col))" -NoNewline; Write-Host "List all models from both catalogs" -ForegroundColor DarkGray
     Write-Host "    $(".\run.ps1 -M".PadRight($col))" -NoNewline; Write-Host "Shortcut for 'models'" -ForegroundColor DarkGray
-    Write-Host "    $(".\run.ps1 os <action>".PadRight($col))" -NoNewline; Write-Host "OS housekeeping: clean, temp-clean, hib-off, flp, add-user ('os help')" -ForegroundColor DarkGray
+    Write-Host "    $(".\run.ps1 os <action>".PadRight($col))" -NoNewline; Write-Host "OS housekeeping: clean, temp-clean, hib-off, flp, add-user ('os -h' for full list)" -ForegroundColor DarkGray
     Write-Host "    $(".\run.ps1 vscode-folder <action>".PadRight($col))" -NoNewline; Write-Host "VS Code folder-only context-menu repair ('vscode-folder help')" -ForegroundColor DarkGray
     Write-Host "    $(".\run.ps1 profile <name>".PadRight($col))" -NoNewline; Write-Host "Run a profile recipe (see 'Profiles' section below for list)" -ForegroundColor DarkGray
     Write-Host "    $(".\run.ps1 install <profile>".PadRight($col))" -NoNewline; Write-Host "Same as above -- 'install minimal' == 'profile minimal'" -ForegroundColor DarkGray
@@ -2844,7 +2844,17 @@ if ($hasCommand) {
             Write-Host "OS dispatcher missing at: $osScript"
             exit 1
         }
-        & $osScript @Install
+        # Forward root-level -h / -Help (which PowerShell binds before $Install
+        # gets a chance) into the os dispatcher as an explicit --help action so
+        # `.\run.ps1 os -h` and `.\run.ps1 os -help` show the OS subcommand list.
+        $osArgs = @()
+        if ($null -ne $Install) { $osArgs = @($Install) }
+        $hasOsAction = ($osArgs.Count -gt 0) -and -not ("$($osArgs[0])".StartsWith("-"))
+        if (($h -or $Help) -and -not $hasOsAction) {
+            & $osScript "--help"
+            exit $LASTEXITCODE
+        }
+        & $osScript @osArgs
         exit $LASTEXITCODE
     }
 
