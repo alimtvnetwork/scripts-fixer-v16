@@ -685,9 +685,11 @@ function Import-JsonConfig {
     $callerInfo = (Get-PSCallStack | Select-Object -Skip 1 -First 1)
     $callerName = if ($null -ne $callerInfo) { $callerInfo.Command } else { '<unknown>' }
 
+    $rawForReport     = if ($null -eq $FilePath) { '<null>' } else { "'$FilePath'" }
+    $trimmedCandidate = if ($null -eq $FilePath) { '' } else { $FilePath.Trim() }
     $isFilePathMissing = [string]::IsNullOrWhiteSpace($FilePath)
     if ($isFilePathMissing) {
-        $reason = "Import-JsonConfig was called with a null or empty -FilePath (caller: $callerName). Pass an absolute or repo-relative path to a .json file."
+        $reason = "Import-JsonConfig was called with a null or empty -FilePath (caller: $callerName, raw value: $rawForReport, trimmed: '$trimmedCandidate'). Pass an absolute or repo-relative path to a .json file."
         if (Get-Command Write-FileError -ErrorAction SilentlyContinue) {
             Write-FileError `
                 -FilePath '<null-or-empty>' `
@@ -700,10 +702,14 @@ function Import-JsonConfig {
             Write-Host "Import-JsonConfig: -FilePath is null or empty."
             Write-Host ("          Reason : " + $reason) -ForegroundColor Gray
         }
-        throw [System.ArgumentException]::new(
-            "Import-JsonConfig: -FilePath is required and cannot be null or empty (caller: $callerName).",
+        $ex = [System.ArgumentException]::new(
+            "Import-JsonConfig: -FilePath is required and cannot be null or empty (caller: $callerName, raw value: $rawForReport, trimmed: '$trimmedCandidate').",
             'FilePath'
         )
+        $ex.Data['TrimmedFilePath'] = $trimmedCandidate
+        $ex.Data['RawFilePath']     = $FilePath
+        $ex.Data['Caller']          = $callerName
+        throw $ex
     }
 
     # Trim and normalize so accidental trailing whitespace from JSON-driven
