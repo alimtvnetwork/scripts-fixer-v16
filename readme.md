@@ -927,6 +927,30 @@ non-interactive setting; without it the helper opens System Settings as a fallba
 .\run.ps1 os startup-remove notepad              # remove a tagged entry by name
 ```
 
+#### Fix VS Code context menu (Windows folder right-click)
+
+`os fix-vscode-context-menu` is a one-liner that delegates to
+[`scripts/52-vscode-folder-repair/`](scripts/52-vscode-folder-repair/).
+It backs up the affected `HKCR` keys (with a `reg import` rollback hint),
+rewrites `Directory\shell\VSCode`, `Directory\Background\shell\VSCode` and
+the `Drive` variants, runs the PASS/FAIL handler verification table, and
+refreshes Explorer — so the "Open with VS Code" entry shows up again
+without rebooting. Requires elevation (writes to `HKEY_CLASSES_ROOT`).
+
+```powershell
+.\run.ps1 os fix-vscode-context-menu                    # full repair + Explorer restart (default)
+.\run.ps1 os fix-vscode-context-menu --dry-run          # preview, no registry writes
+.\run.ps1 os fix-vscode-context-menu --verify           # WhatIf + verbose registry trace
+.\run.ps1 os fix-vscode-context-menu --verify-handlers  # standalone PASS/FAIL handler check (read-only)
+.\run.ps1 os fix-vscode-context-menu --no-restart       # repair but skip explorer.exe restart
+.\run.ps1 os fix-vscode-context-menu --trace            # repair with VerboseRegistry trace
+.\run.ps1 os fix-vscode-context-menu --restore          # re-import the newest BEFORE .reg snapshot
+.\run.ps1 os fix-vscode-context-menu --rollback         # restore default installer entries on all targets
+.\run.ps1 os fix-vscode-context-menu --refresh          # lightweight Explorer/shell refresh only
+.\run.ps1 os fix-vscode-context-menu --edition insiders # target VS Code Insiders specifically
+.\run.ps1 os fix-vscode-context-menu --non-interactive  # CI mode: no prompts
+```
+
 #### Help (all four show the same OS subcommand catalog)
 
 ```powershell
