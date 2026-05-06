@@ -49,6 +49,7 @@ $script:ScriptDir = $scriptDir
 . (Join-Path $sharedDir "install-paths.ps1")
 . (Join-Path $sharedDir "registry-backup.ps1")
 . (Join-Path $sharedDir "interactive-verify.ps1")
+. (Join-Path $sharedDir "confirm-prompt.ps1")
 
 # -- Dot-source script helpers ------------------------------------------------
 . (Join-Path $scriptDir "helpers\conemu-menu.ps1")
