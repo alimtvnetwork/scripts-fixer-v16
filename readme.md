@@ -1476,7 +1476,9 @@ them when you want to grab a specific batch.
 .\run.ps1 install vscode,git,nodejs,pnpm,python
 .\run.ps1 install npp,obs,wt,dbeaver,conemu       # all desktop tools at once
 .\run.ps1 install whatsapp,onenote,lightshot      # 2025-batch desktop apps
-.\run.ps1 install ubuntu-font,conemu              # font + terminal pair
+.\run.ps1 install ubuntu-font,conemu              # font + terminal pair (also wires "Open ConEmu Here" right-click menu)
+.\run.ps1 install conemu-menu                     # ConEmu + right-click "Open ConEmu Here" (script 48 + 59)
+.\run.ps1 install all-settings                    # batch settings sync incl. ConEmu menu (1, 11, 32, 33, 36, 37, 48, 59)
 .\run.ps1 install go,rust,cpp,dotnet,java         # all systems-language runtimes
 
 # By ID range -- handy for sweeping the 2025-batch
