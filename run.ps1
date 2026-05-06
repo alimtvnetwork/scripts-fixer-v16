@@ -883,6 +883,7 @@ function Resolve-InstallKeywords {
     $tokens = [System.Collections.Generic.List[string]]::new()
     $excludeTokens = [System.Collections.Generic.List[string]]::new()
     $pendingExclude = $false
+    $isExcludeStrict = $false
     foreach ($keywordGroup in $Keywords) {
         $isKeywordGroupMissing = [string]::IsNullOrWhiteSpace($keywordGroup)
         if ($isKeywordGroupMissing) {
@@ -891,6 +892,11 @@ function Resolve-InstallKeywords {
 
         $rawTrim  = "$keywordGroup".Trim()
         $rawLower = $rawTrim.ToLower()
+
+        # --exclude-strict: standalone toggle that turns unknown --exclude tokens
+        # into a hard abort instead of a warning. Accepts a few common spellings.
+        $isStrictFlag = $rawLower -in @("--exclude-strict","-exclude-strict","--strict-exclude","-strict-exclude","--excludestrict","-excludestrict")
+        if ($isStrictFlag) { $isExcludeStrict = $true; continue }
 
         # --exclude / -exclude / --ex / --without (consumes the next arg as CSV/space list)
         $isExcludeFlag = $rawLower -in @("--exclude","-exclude","--ex","-ex","--without","-without","--skip","-skip")
