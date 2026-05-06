@@ -141,6 +141,14 @@ while [ $# -gt 0 ]; do
     # mktemp sandboxes.
     e2e-matrix|e2e|test-matrix)
         VERB="e2e-matrix"; shift; break ;;
+    # ---- top-level shortcuts to default-apps (browser + mail client) ----
+    # Mirrors the Windows side `./run.ps1 os browser <name>` /
+    # `./run.ps1 os email <name>`. On Linux uses xdg-settings + xdg-mime,
+    # on macOS prefers `duti` and falls back to opening System Settings.
+    browser|default-browser|set-browser|web-browser)
+        VERB="defapp-passthrough"; DEFAPP_KIND="browser"; shift; DEFAPP_REST=("$@"); break ;;
+    email|mail|default-email|default-mail|set-email|mail-client)
+        VERB="defapp-passthrough"; DEFAPP_KIND="email"; shift; DEFAPP_REST=("$@"); break ;;
     *)
         # `./run.sh install wordpress [args]` lands here AFTER install was consumed.
         # Re-route it through the wp passthrough so the user-friendly form works.
@@ -195,6 +203,21 @@ Cross-OS cleanup (script 65 shortcuts):
       --yes                    Pre-approve destructive (trash, logs-system)
       --json                   Emit machine-readable summary on stdout
   os-clean-list                Print all defined cleanup categories
+
+Default-app management (cross-OS: Linux uses xdg-settings/xdg-mime, macOS uses duti):
+  browser <name> [--list] [--dry-run]   Set default web browser
+                                          Names: chrome | firefox | edge | brave |
+                                                 opera | vivaldi | librewolf |
+                                                 chromium | safari (mac only)
+  email <name> [--list] [--dry-run]     Set default mail (mailto:) client
+                                          Names: thunderbird | evolution | geary |
+                                                 kmail | mailspring | claws | mutt |
+                                                 apple-mail | outlook-mac |
+                                                 spark | airmail (mac only)
+      --list                              Print catalog of available names + exit
+      --dry-run                           Detect + plan only; no changes applied
+      Linux requires xdg-utils; macOS recommends `brew install duti` for
+      non-interactive setting (otherwise opens System Settings as fallback).
 
 macOS VS Code menu cleanup (script 66 shortcuts; macOS only):
   vscode-mac-clean             Remove Finder Services workflows, LaunchAgents/
@@ -597,6 +620,17 @@ case "${VERB:-help}" in
     # Pure test harness -- no helpers loaded, no root required, runs
     # everything inside mktemp sandboxes and stubs.
     bash "$ROOT/_shared/tests/e2e/run-matrix.sh"
+    ;;
+  defapp-passthrough)
+    # Filter empties (some bash versions add a stray "" when "$@" was
+    # empty at capture time -- same dance as other passthroughs).
+    _defapp_filtered=()
+    for _a in "${DEFAPP_REST[@]:-}"; do [ -n "$_a" ] && _defapp_filtered+=("$_a"); done
+    if [ "${#_defapp_filtered[@]}" -gt 0 ]; then
+      bash "$ROOT/default-apps/run.sh" "$DEFAPP_KIND" "${_defapp_filtered[@]}"
+    else
+      bash "$ROOT/default-apps/run.sh" "$DEFAPP_KIND"
+    fi
     ;;
   install|check|repair|uninstall)
     if [ -n "$ONLY_ID" ]; then

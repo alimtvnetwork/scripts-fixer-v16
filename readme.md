@@ -753,6 +753,9 @@ dispatcher: [`scripts/os/run.ps1`](scripts/os/run.ps1).
 | `os startup-add` | Register an app or env-var to run/exist at logon (Startup folder, HKCU/HKLM Run, or scheduled task) | varies | [Examples](#startup-entries-apps--env-vars-at-logon) |
 | `os startup-list` | List all `lovable-startup-*` tagged entries across methods | 👤 No | [Examples](#startup-entries-apps--env-vars-at-logon) |
 | `os startup-remove` | Remove a tagged startup entry by name | varies | [Examples](#startup-entries-apps--env-vars-at-logon) |
+| **Default apps (cross-OS)** | | | |
+| `os browser <name>` | Set default web browser. Win: opens `ms-settings:defaultapps` scoped to the app + verifies `UserChoice`; Linux: `xdg-settings`; macOS: `duti` (or System Settings fallback). Names: `chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `librewolf` (+ `chromium`/`safari` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
+| `os email <name>` | Set default mail (`mailto:`) client. Same cross-OS strategy. Names: `outlook`, `outlook-new`, `thunderbird`, `mailbird`, `em-client`, `windows-mail` (+ `evolution`/`geary`/`kmail`/`mailspring`/`apple-mail`/`outlook-mac`/`spark`/`airmail` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
 | **macOS** | | | |
 | `os clean-vscode-mac` | macOS-only: surgical removal of VS Code Services, `code` CLI symlink, LaunchServices entries, login items, LaunchAgents | 👤 No | [Examples](#os-commands) |
 
@@ -817,8 +820,57 @@ One short example per subcommand listed in the OS table above. Add `--dry-run` t
 .\run.ps1 os startup-list                             # os startup-list    : list lovable-startup-* tagged entries
 .\run.ps1 os startup-remove notepad                   # os startup-remove  : remove a tagged entry by name
 
+# --- Default apps (cross-OS) ---
+.\run.ps1 os browser chrome                           # os browser    : set Chrome as default web browser
+.\run.ps1 os email   thunderbird                      # os email      : set Thunderbird as default mail client
+.\run.ps1 os browser --list                           # os browser    : print catalog (display names + aliases)
+.\run.ps1 os email   --list                           # os email      : print catalog of supported mail clients
+
 # --- Platform-specific ---
 .\run.ps1 os clean-vscode-mac                         # os clean-vscode-mac: macOS-only VS Code residue removal
+```
+
+#### Default apps (browser + mail client)
+
+Cross-OS: **Windows** opens the modern `ms-settings:defaultapps` page scoped to the
+chosen app, then verifies the `UserChoice` ProgId after the user clicks "Set default"
+(Win 10/11 hash-protect that key, so the click cannot be skipped). **Linux** uses
+`xdg-settings` for the browser and `xdg-mime` for `mailto:`. **macOS** prefers
+[`duti`](https://github.com/moretension/duti) (`brew install duti`) for fully
+non-interactive setting; without it the helper opens System Settings as a fallback.
+
+```powershell
+# Windows -- browser
+.\run.ps1 os browser chrome             # Chrome (also: google-chrome, googlechrome)
+.\run.ps1 os browser firefox            # Firefox (also: ff, mozilla-firefox)
+.\run.ps1 os browser edge               # Edge   (also: msedge, microsoft-edge)
+.\run.ps1 os browser brave              # Brave  (also: brave-browser)
+.\run.ps1 os browser opera              # Opera Stable
+.\run.ps1 os browser vivaldi            # Vivaldi
+.\run.ps1 os browser librewolf          # LibreWolf
+.\run.ps1 os browser chrome --dry-run   # detect + plan only, do not open Settings
+.\run.ps1 os browser --list             # print all supported names + aliases
+
+# Windows -- mail client
+.\run.ps1 os email outlook              # Outlook (Office desktop)
+.\run.ps1 os email outlook-new          # New Outlook for Windows (MSIX)
+.\run.ps1 os email thunderbird          # Mozilla Thunderbird
+.\run.ps1 os email mailbird             # Mailbird
+.\run.ps1 os email em-client            # eM Client
+.\run.ps1 os email windows-mail         # legacy UWP Windows Mail
+.\run.ps1 os email --list               # print all supported names + aliases
+```
+
+```bash
+# Linux (xdg-settings / xdg-mime; requires xdg-utils)
+./run.sh browser chrome                 # also: firefox, edge, brave, opera, vivaldi, librewolf, chromium
+./run.sh email   thunderbird            # also: evolution, geary, kmail, mailspring, claws, mutt
+./run.sh browser --list
+./run.sh email   --dry-run thunderbird
+
+# macOS (prefers duti; brew install duti)
+./run.sh browser safari                 # also: chrome, firefox, edge, brave, opera, vivaldi
+./run.sh email   apple-mail             # also: outlook-mac, thunderbird, spark, airmail, mailspring
 ```
 
 #### Usage examples: `os update`, `os power`, `os temp-clean`
