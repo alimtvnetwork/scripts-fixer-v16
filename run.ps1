@@ -553,7 +553,8 @@ function Show-RootHelp {
     Write-Host "      $("obs".PadRight(20))" -NoNewline; Write-Host "$("[36]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "obs-studio, obs+settings, obs-settings, install-obs" -ForegroundColor DarkGray
     Write-Host "      $("wt".PadRight(20))" -NoNewline; Write-Host "$("[37]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "windows-terminal, wt+settings, wt-settings, install-wt" -ForegroundColor DarkGray
     Write-Host "      $("dbeaver".PadRight(20))" -NoNewline; Write-Host "$("[32]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "db-viewer, dbviewer, dbeaver+settings, dbeaver-settings" -ForegroundColor DarkGray
-    Write-Host "      $("conemu".PadRight(20))" -NoNewline; Write-Host "$("[48]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "conemu+settings, conemu-settings, install-conemu" -ForegroundColor DarkGray
+    Write-Host "      $("conemu".PadRight(20))" -NoNewline; Write-Host "$("[48, 59]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "conemu+settings, conemu-settings, install-conemu, conemu-menu, conemu+menu, conemu-context-menu" -ForegroundColor DarkGray
+    Write-Host "      $("conemu-menu".PadRight(20))" -NoNewline; Write-Host "$("[59]".PadRight(18))" -NoNewline -ForegroundColor Cyan; Write-Host "conemu+menu, conemu-context-menu (right-click only; keeps script 48 install)" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "      Flag spellings (all equivalent):" -ForegroundColor DarkGray
     Write-Host "        --exclude  -exclude  --ex  -ex  --without  -without  --skip  -skip" -ForegroundColor DarkGray
