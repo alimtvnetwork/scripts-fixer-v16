@@ -753,6 +753,9 @@ dispatcher: [`scripts/os/run.ps1`](scripts/os/run.ps1).
 | `os startup-add` | Register an app or env-var to run/exist at logon (Startup folder, HKCU/HKLM Run, or scheduled task) | varies | [Examples](#startup-entries-apps--env-vars-at-logon) |
 | `os startup-list` | List all `lovable-startup-*` tagged entries across methods | 👤 No | [Examples](#startup-entries-apps--env-vars-at-logon) |
 | `os startup-remove` | Remove a tagged startup entry by name | varies | [Examples](#startup-entries-apps--env-vars-at-logon) |
+| **Default apps (cross-OS)** | | | |
+| `os browser <name>` | Set default web browser. Win: opens `ms-settings:defaultapps` scoped to the app + verifies `UserChoice`; Linux: `xdg-settings`; macOS: `duti` (or System Settings fallback). Names: `chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `librewolf` (+ `chromium`/`safari` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
+| `os email <name>` | Set default mail (`mailto:`) client. Same cross-OS strategy. Names: `outlook`, `outlook-new`, `thunderbird`, `mailbird`, `em-client`, `windows-mail` (+ `evolution`/`geary`/`kmail`/`mailspring`/`apple-mail`/`outlook-mac`/`spark`/`airmail` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
 | **macOS** | | | |
 | `os clean-vscode-mac` | macOS-only: surgical removal of VS Code Services, `code` CLI symlink, LaunchServices entries, login items, LaunchAgents | 👤 No | [Examples](#os-commands) |
 
