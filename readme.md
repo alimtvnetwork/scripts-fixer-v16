@@ -779,28 +779,46 @@ nothing else is deleted.
 
 ### OS commands
 
+One short example per subcommand listed in the OS table above. Add `--dry-run` to any destructive command to preview first.
+
 ```powershell
-# Always preview first
-.\run.ps1 os clean --dry-run
+# --- Cleaning ---
+.\run.ps1 os clean --dry-run                          # os clean --dry-run : preview every target, delete nothing
+.\run.ps1 os clean                                    # os clean           : master cleaner with per-target confirmation
+.\run.ps1 os clean --skip recycle,ms-search           # os clean           : skip specific categories
+.\run.ps1 os clean-chrome                             # os clean-<category>: single-category sweep (36 available)
+.\run.ps1 os temp-clean                               # os temp-clean      : standalone %TEMP% + Windows\Temp + choco temp
+.\run.ps1 os choco-clean                              # os choco-clean     : chocolatey lib-bad/lib-bkp/.backup quarantine
 
-# Real run (asks for confirmation per target)
-.\run.ps1 os clean
+# --- System tweaks ---
+.\run.ps1 os hib-off                                  # os hib-off         : disable hibernation, free hiberfil.sys
+.\run.ps1 os hib-on                                   # os hib-on          : re-enable hibernation
+.\run.ps1 os flp                                      # os flp             : enable Win32 long paths (reboot recommended)
+.\run.ps1 os power                                    # os power           : never-sleep powercfg timeouts (AC + DC)
+.\run.ps1 os update                                   # os update          : Windows Update scan + download + install
 
-# Skip specific categories
-.\run.ps1 os clean --skip recycle,ms-search
+# --- Local users & groups ---
+.\run.ps1 os add-user alice MyP@ss123                 # os add-user        : create a local user
+.\run.ps1 os edit-user alice --password NewP@ss1      # os edit-user       : change password / groups / flags
+.\run.ps1 os remove-user alice --purge                # os remove-user     : delete user and purge profile
+.\run.ps1 os add-user-json users.json                 # os add-user-json   : bulk create from JSON
+.\run.ps1 os edit-user-json users.json                # os edit-user-json  : bulk edit from JSON
+.\run.ps1 os remove-user-json users.json              # os remove-user-json: bulk delete from JSON
+.\run.ps1 os add-group devs                           # os add-group       : create a local group
+.\run.ps1 os add-group-json groups.json               # os add-group-json  : bulk create groups from JSON
 
-# Single-category cleans (no prompts, scoped)
-.\run.ps1 os clean-chrome
-.\run.ps1 os clean-recycle --yes
-.\run.ps1 os clean-obs-recordings --days 7 --dry-run
+# --- SSH keys (cross-OS ledger aware) ---
+.\run.ps1 os gen-key                                  # os gen-key         : generate ed25519 keypair into %USERPROFILE%\.ssh
+.\run.ps1 os install-key alice ~/keys/alice.pub       # os install-key     : add pubkey to authorized_keys
+.\run.ps1 os revoke-key alice ~/keys/alice.pub        # os revoke-key      : remove + mark revoked in ledger
 
-# Other os tasks
-.\run.ps1 os hib-off          # disable hibernation, free hiberfil.sys
-.\run.ps1 os flp              # enable Win32 long paths (HKLM, reboot recommended)
-.\run.ps1 os power            # apply powercfg never-sleep timeouts (AC + DC)
-.\run.ps1 os update           # run Windows Update (scan + download + install)
-.\run.ps1 os temp-clean       # standalone temp/cache sweep
-.\run.ps1 os choco-clean      # chocolatey lib-bad/lib-bkp/.backup quarantine sweep
+# --- Startup entries (apps + env vars at logon) ---
+.\run.ps1 os startup-add app --name notepad --path C:\Windows\notepad.exe   # os startup-add    : register app at logon
+.\run.ps1 os startup-list                             # os startup-list    : list lovable-startup-* tagged entries
+.\run.ps1 os startup-remove notepad                   # os startup-remove  : remove a tagged entry by name
+
+# --- Platform-specific ---
+.\run.ps1 os clean-vscode-mac                         # os clean-vscode-mac: macOS-only VS Code residue removal
 ```
 
 #### Usage examples: `os update`, `os power`, `os temp-clean`
@@ -828,28 +846,31 @@ nothing else is deleted.
 #### Local users & groups
 
 ```powershell
-.\run.ps1 os add-user         # create a local user
-.\run.ps1 os edit-user        # modify password / groups / flags
-.\run.ps1 os remove-user      # delete a local user (optionally purge profile)
+.\run.ps1 os add-user alice MyP@ss123       # create a local user
+.\run.ps1 os edit-user alice --add-group Administrators  # modify groups / password / flags
+.\run.ps1 os remove-user alice --purge      # delete a local user and purge profile
 .\run.ps1 os add-user-json users.json       # bulk add from JSON
-.\run.ps1 os add-group        # create a local group
+.\run.ps1 os edit-user-json users.json      # bulk edit from JSON
+.\run.ps1 os remove-user-json users.json    # bulk delete from JSON
+.\run.ps1 os add-group devs                 # create a local group
 .\run.ps1 os add-group-json groups.json     # bulk add groups
 ```
 
 #### SSH keys (cross-OS ledger aware)
 
 ```powershell
-.\run.ps1 os gen-key          # generate ed25519 keypair into %USERPROFILE%\.ssh
-.\run.ps1 os install-key      # install a public key into authorized_keys
-.\run.ps1 os revoke-key       # remove + mark revoked in the ledger
+.\run.ps1 os gen-key                              # generate ed25519 keypair into %USERPROFILE%\.ssh
+.\run.ps1 os install-key alice ~/keys/alice.pub   # install a public key into authorized_keys
+.\run.ps1 os revoke-key alice ~/keys/alice.pub    # remove + mark revoked in the ledger
 ```
 
 #### Startup entries (apps + env vars at logon)
 
 ```powershell
-.\run.ps1 os startup-add      # register app or env-var
-.\run.ps1 os startup-list     # list lovable-startup-* tagged entries
-.\run.ps1 os startup-remove   # remove a tagged entry by name
+.\run.ps1 os startup-add app --name notepad --path C:\Windows\notepad.exe  # register app
+.\run.ps1 os startup-add env --name DEV_DIR --value C:\dev-tool            # register env var
+.\run.ps1 os startup-list                        # list lovable-startup-* tagged entries
+.\run.ps1 os startup-remove notepad              # remove a tagged entry by name
 ```
 
 #### Help (all four show the same OS subcommand catalog)
