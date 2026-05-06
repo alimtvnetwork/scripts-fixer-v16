@@ -634,15 +634,19 @@ function Import-JsonConfig {
         if (Get-Command Write-FileError -ErrorAction SilentlyContinue) {
             Write-FileError -FilePath $FilePath -Operation "load" -Reason "File does not exist" -Module "Import-JsonConfig"
         }
-        Write-Log (($tplNotFound -replace '\{label\}', $Label) -replace '\{path\}', $FilePath) -Level "error"
+        $msgNotFound = ([string]$tplNotFound).Replace('{label}', $safeLabel).Replace('{path}', $safePath)
+        Write-Log $msgNotFound -Level "error"
         return $null
     }
 
     $content = Get-Content $FilePath -Raw
-    Write-Log (($tplSize -replace '\{label\}', $Label) -replace '\{size\}', $content.Length) -Level "info"
+    $safeSize = if ($null -eq $content) { '0' } else { [string]$content.Length }
+    $msgSize = ([string]$tplSize).Replace('{label}', $safeLabel).Replace('{size}', $safeSize)
+    Write-Log $msgSize -Level "info"
 
     $parsed = $content | ConvertFrom-Json
-    Write-Log ($tplLoaded -replace '\{label\}', $Label) -Level "success"
+    $msgLoaded = ([string]$tplLoaded).Replace('{label}', $safeLabel)
+    Write-Log $msgLoaded -Level "success"
     return $parsed
 }
 
