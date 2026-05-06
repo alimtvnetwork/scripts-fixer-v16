@@ -756,6 +756,8 @@ dispatcher: [`scripts/os/run.ps1`](scripts/os/run.ps1).
 | **Default apps (cross-OS)** | | | |
 | `os browser <name>` | Set default web browser. Win: opens `ms-settings:defaultapps` scoped to the app + verifies `UserChoice`; Linux: `xdg-settings`; macOS: `duti` (or System Settings fallback). Names: `chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `librewolf` (+ `chromium`/`safari` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
 | `os email <name>` | Set default mail (`mailto:`) client. Same cross-OS strategy. Names: `outlook`, `outlook-new`, `thunderbird`, `mailbird`, `em-client`, `windows-mail` (+ `evolution`/`geary`/`kmail`/`mailspring`/`apple-mail`/`outlook-mac`/`spark`/`airmail` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
+| **Windows context-menu repair** | | | |
+| `os fix-vscode-context-menu` | One-shot repair of the Windows folder right-click "Open with VS Code" entries. Thin wrapper that delegates to script 52 (`scripts/52-vscode-folder-repair/`): backs up `HKCR\Directory\shell\VSCode` + Background + Drive variants, rewrites entries, runs PASS/FAIL handler verification, and refreshes Explorer. Flags: `--dry-run`, `--verify`, `--verify-handlers`, `--no-restart`, `--trace`, `--restore`, `--rollback`, `--refresh`, `--edition stable\|insiders` | 🛡️ Yes | [Examples](#fix-vscode-context-menu-windows-folder-right-click) |
 | **macOS** | | | |
 | `os clean-vscode-mac` | macOS-only: surgical removal of VS Code Services, `code` CLI symlink, LaunchServices entries, login items, LaunchAgents | 👤 No | [Examples](#os-commands) |
 
