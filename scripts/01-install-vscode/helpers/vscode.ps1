@@ -10,27 +10,52 @@ if ((Test-Path $_loggingPath) -and -not (Get-Command Write-Log -ErrorAction Sile
 }
 
 
+function Get-ChocoPackageVersion {
+    <#
+    .SYNOPSIS
+        Robustly extract the installed version of a choco package.
+        Handles Choco 1.x (--local-only) and 2.x output, and returns
+        empty string when not installed (never the package name itself
+        or summary text like "1 packages installed").
+    #>
+    param([Parameter(Mandatory)][string]$PackageName)
+
+    # Choco 2.x removed --local-only; pass it anyway -- choco emits a
+    # deprecation warning to stderr but still works. Capture only stdout.
+    $raw = & choco list --exact $PackageName --limit-output 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $raw) { return "" }
+
+    # --limit-output format is strictly "name|version" per line.
+    foreach ($line in @($raw)) {
+        $isMatch = $line -match "^$([regex]::Escape($PackageName))\|(.+)$"
+        if ($isMatch) { return $Matches[1].Trim() }
+    }
+    return ""
+}
+
 function Install-VsCodeEdition {
     param(
         [string]$ChocoPackageName,
         [string]$Label,
+        [string]$TrackingName,
         $LogMessages
     )
 
     Write-Log ($LogMessages.messages.installingEdition -replace '\{label\}', $Label) -Level "info"
 
-    # Derive tracking name from label (e.g. "VS Code Stable" -> "vscode-stable")
-    $trackingName = "vscode-" + ($Label.ToLower() -replace '[^a-z0-9]+', '-').Trim('-')
+    # Tracking name comes from caller (canonical: 'vscode' / 'vscode-insiders')
+    # so we never get doubled names like 'vscode-vs-code-stable'.
+    $isTrackingMissing = [string]::IsNullOrWhiteSpace($TrackingName)
+    if ($isTrackingMissing) {
+        $TrackingName = "vscode-" + ($Label.ToLower() -replace '[^a-z0-9]+', '-').Trim('-')
+    }
 
-    # Check if already installed
-    $existing = choco list --local-only --exact $ChocoPackageName 2>&1
-    $isInstalled = $LASTEXITCODE -eq 0 -and $existing -match $ChocoPackageName
+    # Check if already installed via robust parser
+    $chocoVersion = Get-ChocoPackageVersion -PackageName $ChocoPackageName
+    $isInstalled = -not [string]::IsNullOrWhiteSpace($chocoVersion)
     if ($isInstalled) {
-        # Extract version from choco list output
-        $chocoVersion = ($existing | Select-String $ChocoPackageName) -replace ".*$ChocoPackageName\s*", "" | ForEach-Object { $_.Trim() }
-
         # Check .installed/ tracking
-        $isAlreadyTracked = Test-AlreadyInstalled -Name $trackingName -CurrentVersion $chocoVersion
+        $isAlreadyTracked = Test-AlreadyInstalled -Name $TrackingName -CurrentVersion $chocoVersion
         if ($isAlreadyTracked) {
             Write-Log ($LogMessages.messages.editionAlreadyInstalled -replace '\{label\}', $Label) -Level "info"
             return $true
@@ -42,13 +67,13 @@ function Install-VsCodeEdition {
             $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
             Write-Log ($LogMessages.messages.editionUpgradeSuccess -replace '\{label\}', $Label) -Level "success"
 
-            $newVersion = (choco list --local-only --exact $ChocoPackageName 2>&1 | Select-String $ChocoPackageName) -replace ".*$ChocoPackageName\s*", "" | ForEach-Object { $_.Trim() }
+            $newVersion = Get-ChocoPackageVersion -PackageName $ChocoPackageName
             $isVersionEmpty = [string]::IsNullOrWhiteSpace($newVersion)
-            if ($isVersionEmpty) { $newVersion = "(version pending)" }
-            Save-InstalledRecord -Name $trackingName -Version $newVersion
+            if ($isVersionEmpty) { $newVersion = $chocoVersion }  # fall back to pre-upgrade version
+            Save-InstalledRecord -Name $TrackingName -Version $newVersion
         } catch {
             Write-Log "VS Code ($Label) upgrade failed: $_" -Level "error"
-            Save-InstalledError -Name $trackingName -ErrorMessage "$_"
+            Save-InstalledError -Name $TrackingName -ErrorMessage "$_"
         }
         return $true
     }
@@ -58,13 +83,15 @@ function Install-VsCodeEdition {
         $installResult = Install-ChocoPackage -PackageName $ChocoPackageName
         if ($installResult) {
             Write-Log ($LogMessages.messages.editionInstallSuccess -replace '\{label\}', $Label) -Level "success"
-            $newVersion = (choco list --local-only --exact $ChocoPackageName 2>&1 | Select-String $ChocoPackageName) -replace ".*$ChocoPackageName\s*", "" | ForEach-Object { $_.Trim() }
-            Save-InstalledRecord -Name $trackingName -Version $newVersion
+            $newVersion = Get-ChocoPackageVersion -PackageName $ChocoPackageName
+            $isVersionEmpty = [string]::IsNullOrWhiteSpace($newVersion)
+            if ($isVersionEmpty) { $newVersion = "unknown" }
+            Save-InstalledRecord -Name $TrackingName -Version $newVersion
         }
         return $installResult
     } catch {
         Write-Log "VS Code ($Label) install failed: $_" -Level "error"
-        Save-InstalledError -Name $trackingName -ErrorMessage "$_"
+        Save-InstalledError -Name $TrackingName -ErrorMessage "$_"
         return $false
     }
 }
@@ -80,16 +107,24 @@ function Invoke-VsCodeSetup {
     $isAutoYes = $env:SCRIPTS_AUTO_YES -eq "1"
     $shouldPrompt = [bool]$Config.promptEdition
 
+    # Local helper: forward to Install-VsCodeEdition with the canonical
+    # tracking name so .installed/ files are 'vscode.json' / 'vscode-insiders.json'
+    # (not 'vscode-vs-code-stable.json').
+    function Install-VsCodeEditionByKey([string]$Key) {
+        $ed = $editions.$Key
+        $tracking = if ($Key -eq "insiders") { "vscode-insiders" } else { "vscode" }
+        Install-VsCodeEdition -ChocoPackageName $ed.chocoPackageName `
+                              -Label $ed.label `
+                              -TrackingName $tracking `
+                              -LogMessages $LogMessages
+    }
+
     switch ($Command) {
         "stable" {
-            Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                   -Label $editions.stable.label `
-                                   -LogMessages $LogMessages
+            Install-VsCodeEditionByKey "stable"
         }
         "insiders" {
-            Install-VsCodeEdition -ChocoPackageName $editions.insiders.chocoPackageName `
-                                   -Label $editions.insiders.label `
-                                   -LogMessages $LogMessages
+            Install-VsCodeEditionByKey "insiders"
         }
         "all" {
             # Check env var from orchestrator questionnaire first
@@ -102,16 +137,8 @@ function Invoke-VsCodeSetup {
                 $isStable   = $editionsEnv -match "stable"
                 $isInsiders = $editionsEnv -match "insiders"
 
-                if ($isStable) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                           -Label $editions.stable.label `
-                                           -LogMessages $LogMessages
-                }
-                if ($isInsiders) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.insiders.chocoPackageName `
-                                           -Label $editions.insiders.label `
-                                           -LogMessages $LogMessages
-                }
+                if ($isStable)   { Install-VsCodeEditionByKey "stable" }
+                if ($isInsiders) { Install-VsCodeEditionByKey "insiders" }
             }
             elseif ($shouldPrompt -and -not $isAutoYes) {
                 Write-Host ""
@@ -127,44 +154,27 @@ function Invoke-VsCodeSetup {
                 $isBoth = $choice -eq "3"
 
                 if ($isDefaultOrStable) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                           -Label $editions.stable.label `
-                                           -LogMessages $LogMessages
+                    Install-VsCodeEditionByKey "stable"
                 }
                 elseif ($isInsiders) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.insiders.chocoPackageName `
-                                           -Label $editions.insiders.label `
-                                           -LogMessages $LogMessages
+                    Install-VsCodeEditionByKey "insiders"
                 }
                 elseif ($isBoth) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                           -Label $editions.stable.label `
-                                           -LogMessages $LogMessages
-                    Install-VsCodeEdition -ChocoPackageName $editions.insiders.chocoPackageName `
-                                           -Label $editions.insiders.label `
-                                           -LogMessages $LogMessages
+                    Install-VsCodeEditionByKey "stable"
+                    Install-VsCodeEditionByKey "insiders"
                 }
                 else {
-                    Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                           -Label $editions.stable.label `
-                                           -LogMessages $LogMessages
+                    Install-VsCodeEditionByKey "stable"
                 }
             }
             else {
                 # No prompt: install what's enabled in config
-                if ($editions.stable.enabled) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.stable.chocoPackageName `
-                                           -Label $editions.stable.label `
-                                           -LogMessages $LogMessages
-                }
-                if ($editions.insiders.enabled) {
-                    Install-VsCodeEdition -ChocoPackageName $editions.insiders.chocoPackageName `
-                                           -Label $editions.insiders.label `
-                                           -LogMessages $LogMessages
-                }
+                if ($editions.stable.enabled)   { Install-VsCodeEditionByKey "stable" }
+                if ($editions.insiders.enabled) { Install-VsCodeEditionByKey "insiders" }
             }
         }
     }
+}
 }
 
 function Uninstall-VsCode {
