@@ -571,18 +571,85 @@ function Save-LogFile {
 }
 
 function Import-JsonConfig {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [AllowNull()]
+        [AllowEmptyString()]
         [string]$FilePath,
 
         [Parameter(Position = 1)]
+        [AllowNull()]
+        [AllowEmptyString()]
         [string]$Label
     )
 
+    # ----------------------------------------------------------------------
+    # CODE RED parameter validation. Fail FAST with a clear error that
+    # includes the exact missing/invalid input + reason, instead of letting
+    # a $null path crash deep inside Test-Path / Get-Content with cryptic
+    # ".NET" errors. We accept null/empty at the parameter binder level
+    # (via [AllowNull]/[AllowEmptyString]) so we can produce our own
+    # standardized message via Write-FileError when available.
+    # ----------------------------------------------------------------------
+    $callerInfo = (Get-PSCallStack | Select-Object -Skip 1 -First 1)
+    $callerName = if ($null -ne $callerInfo) { $callerInfo.Command } else { '<unknown>' }
+
+    $isFilePathMissing = [string]::IsNullOrWhiteSpace($FilePath)
+    if ($isFilePathMissing) {
+        $reason = "Import-JsonConfig was called with a null or empty -FilePath (caller: $callerName). Pass an absolute or repo-relative path to a .json file."
+        if (Get-Command Write-FileError -ErrorAction SilentlyContinue) {
+            Write-FileError `
+                -FilePath '<null-or-empty>' `
+                -Operation 'load' `
+                -Reason    $reason `
+                -Module    'Import-JsonConfig'
+        } else {
+            Write-Host ""
+            Write-Host "  [ FAIL ] " -ForegroundColor Red -NoNewline
+            Write-Host "Import-JsonConfig: -FilePath is null or empty."
+            Write-Host ("          Reason : " + $reason) -ForegroundColor Gray
+        }
+        throw [System.ArgumentException]::new(
+            "Import-JsonConfig: -FilePath is required and cannot be null or empty (caller: $callerName).",
+            'FilePath'
+        )
+    }
+
+    # Trim and normalize so accidental trailing whitespace from JSON-driven
+    # callers doesn't trip Test-Path on Windows.
+    $FilePath = $FilePath.Trim()
+
+    # Reject obviously-bogus paths (control chars, wildcards) before we
+    # touch the filesystem -- gives the caller a useful message instead of
+    # a generic "Cannot find path" further down.
+    $hasInvalidChars = $false
+    try {
+        $invalid = [System.IO.Path]::GetInvalidPathChars()
+        foreach ($ch in $FilePath.ToCharArray()) {
+            if ($invalid -contains $ch) { $hasInvalidChars = $true; break }
+        }
+    } catch { $hasInvalidChars = $false }
+    if ($hasInvalidChars) {
+        $reason = "Path contains characters that are illegal on this filesystem (caller: $callerName)."
+        if (Get-Command Write-FileError -ErrorAction SilentlyContinue) {
+            Write-FileError `
+                -FilePath $FilePath `
+                -Operation 'load' `
+                -Reason    $reason `
+                -Module    'Import-JsonConfig'
+        }
+        throw [System.ArgumentException]::new(
+            "Import-JsonConfig: -FilePath '$FilePath' contains invalid path characters.",
+            'FilePath'
+        )
+    }
+
     $slm = $script:SharedLogMessages
 
-    $isLabelMissing = -not $Label
+    $isLabelMissing = [string]::IsNullOrWhiteSpace($Label)
     if ($isLabelMissing) { $Label = Split-Path -Leaf $FilePath }
+    if ([string]::IsNullOrWhiteSpace($Label)) { $Label = 'config' }
 
     # ----------------------------------------------------------------------
     # Defensive template lookup. The shared log-messages.json may be
