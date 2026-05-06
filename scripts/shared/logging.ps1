@@ -660,6 +660,77 @@ function Save-LogFile {
 
 }
 
+<#
+.SYNOPSIS
+    Loads a JSON configuration file and returns it as a PSCustomObject.
+
+.DESCRIPTION
+    Import-JsonConfig is the standard helper used across all Scripts Fixer
+    PowerShell modules to load *.json side-car configs (log-messages.json,
+    install-keywords.json, profile.json, etc.).
+
+    It performs CODE RED parameter validation up front: a null, empty, or
+    whitespace -FilePath, or a path containing characters that are illegal
+    on the current filesystem, throws a [System.ArgumentException] whose
+    message includes the trimmed FilePath, the exact invalid characters
+    detected (with codepoint + index), and the calling function name. The
+    same details are also attached to $_.Exception.Data for programmatic
+    access (keys: TrimmedFilePath, RawFilePath, InvalidCharacters, Caller).
+
+    On any failure the helper also routes through Write-FileError when
+    available so the console gets a consistent "[ FAIL ] file ... reason"
+    block.
+
+.PARAMETER FilePath
+    REQUIRED. Absolute or repo-relative path to a .json file.
+
+    Accepted forms:
+      - Absolute Windows path : 'D:\scripts-fixer\scripts\shared\log-messages.json'
+      - Relative path         : 'scripts\shared\log-messages.json'
+      - Joined path           : (Join-Path $PSScriptRoot 'log-messages.json')
+
+    Rejected (throws ArgumentException with details):
+      - $null, '', '   '        -> "null or empty -FilePath"
+      - Paths with control chars or wildcards illegal under
+        [System.IO.Path]::GetInvalidPathChars()
+
+    Leading/trailing whitespace is trimmed automatically before any
+    filesystem call, so JSON-driven callers don't trip Test-Path.
+
+.PARAMETER Label
+    OPTIONAL. Short human-readable tag prefixed to log lines emitted while
+    loading this config (e.g. 'log-messages', 'profile', 'keywords').
+    When omitted, the file's BaseName is used.
+
+    Examples: 'log-messages', 'install-keywords', 'profile.advanced'.
+
+.EXAMPLE
+    # Typical usage from a script that lives next to its config
+    $cfg = Import-JsonConfig (Join-Path $PSScriptRoot 'log-messages.json') 'log-messages'
+
+.EXAMPLE
+    # Repo-relative path, no label (BaseName 'profile' is used)
+    $profile = Import-JsonConfig 'scripts/shared/profile.json'
+
+.EXAMPLE
+    # Defensive callers can catch the rich validation error
+    try {
+        $cfg = Import-JsonConfig $userSuppliedPath 'user-config'
+    } catch [System.ArgumentException] {
+        Write-Host "Bad config path: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Trimmed: $($_.Exception.Data['TrimmedFilePath'])"
+        Write-Host "Invalid chars: $($_.Exception.Data['InvalidCharacters'] -join ', ')"
+    }
+
+.OUTPUTS
+    System.Management.Automation.PSCustomObject - the parsed JSON, or $null
+    if the file could not be read or parsed (after Write-FileError logs the
+    reason).
+
+.NOTES
+    Caller name is captured via Get-PSCallStack and embedded in every
+    error so you can grep logs for "(caller: <YourFunction>)".
+#>
 function Import-JsonConfig {
     [CmdletBinding()]
     param(
