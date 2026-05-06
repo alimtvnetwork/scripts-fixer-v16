@@ -25,6 +25,9 @@ param(
     [string]$SnapshotFile = '',
     [switch]$DryRun,
     [switch]$Help,
+    [switch]$NonInteractive,
+    [Alias('Yes','y')]
+    [switch]$AssumeYes,
 
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Rest
