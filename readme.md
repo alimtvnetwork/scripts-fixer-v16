@@ -797,7 +797,28 @@ nothing else is deleted.
 # Other os tasks
 .\run.ps1 os hib-off          # disable hibernation, free hiberfil.sys
 .\run.ps1 os flp              # enable Win32 long paths (HKLM, reboot recommended)
+.\run.ps1 os power            # apply powercfg never-sleep timeouts (AC + DC)
+.\run.ps1 os update           # run Windows Update (scan + download + install)
+.\run.ps1 os temp-clean       # standalone temp/cache sweep
+.\run.ps1 os choco-clean      # chocolatey lib-bad/lib-bkp/.backup quarantine sweep
+
+# Local users & groups
 .\run.ps1 os add-user         # create a local user
+.\run.ps1 os edit-user        # modify password / groups / flags
+.\run.ps1 os remove-user      # delete a local user (optionally purge profile)
+.\run.ps1 os add-user-json users.json       # bulk add from JSON
+.\run.ps1 os add-group        # create a local group
+.\run.ps1 os add-group-json groups.json     # bulk add groups
+
+# SSH keys (cross-OS ledger aware)
+.\run.ps1 os gen-key          # generate ed25519 keypair into %USERPROFILE%\.ssh
+.\run.ps1 os install-key      # install a public key into authorized_keys
+.\run.ps1 os revoke-key       # remove + mark revoked in the ledger
+
+# Startup entries (apps + env vars at logon)
+.\run.ps1 os startup-add      # register app or env-var
+.\run.ps1 os startup-list     # list lovable-startup-* tagged entries
+.\run.ps1 os startup-remove   # remove a tagged entry by name
 
 # Help
 .\run.ps1 os --help           # shows every action incl. the 36 clean-* categories
