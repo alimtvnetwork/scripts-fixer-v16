@@ -242,7 +242,7 @@ if ($normalizedAction -in @("", "help", "--help", "-h")) {
     Show-ProfileHelp -Config $config
     exit 0
 }
-if ($normalizedAction -eq "list") {
+if ($normalizedAction -in @("list", "ls", "--list", "-l", "show", "all")) {
     Show-ProfileList -Config $config
     exit 0
 }
