@@ -240,7 +240,7 @@ Duplicate IDs are automatically de-duplicated and sorted by ID for logical execu
 4. If path provided: validate format (`X:\...`), save to `scripts/dev-path.json`, confirm
 5. Exit
 
-**Storage:** The saved path is persisted in `scripts/dev-path.json` as `{"path": "D:\\devtools"}`.
+**Storage:** The saved path is persisted in `scripts/dev-path.json` as `{"path": "D:\\dev-tool"}`.
 
 **Priority chain** for dev directory resolution (in `Resolve-DevDir`):
 1. `-Path` parameter (per-run override)
