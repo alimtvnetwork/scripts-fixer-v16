@@ -45,6 +45,7 @@ $script:ScriptDir = $scriptDir
 . (Join-Path $sharedDir "installed.ps1")
 . (Join-Path $sharedDir "install-paths.ps1")
 . (Join-Path $sharedDir "registry-backup.ps1")
+. (Join-Path $sharedDir "interactive-verify.ps1")
 
 # -- Dot-source script helpers ------------------------------------------------
 . (Join-Path $scriptDir "helpers\conemu-menu.ps1")
@@ -195,6 +196,15 @@ if ($isAllSuccessful) {
 } else {
     Write-Log $logMessages.messages.completedWithWarnings -Level "warn"
 }
+
+# -- Interactive right-click verification (install path only) -----------------
+# Folder right-click + folder-background right-click. (Empty-folder background
+# uses the same Directory\Background handler as 'background', so we map the
+# 'empty-folder' test to that registry path too.)
+$null = Invoke-RightClickVerification `
+    -Tool         'ConEmu' `
+    -EntryLabel   'ConEmu Here' `
+    -RetryCommand ".\run.ps1 -I 59 install"
 
 # -- Save resolved state -------------------------------------------------------
 Save-ResolvedData -ScriptFolder "59-conemu-context-menu" -Data @{
