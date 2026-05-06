@@ -98,19 +98,21 @@ function Save-InstalledRecord {
     $installedDir = Get-InstalledDir
 
     $data = @{
-        name        = $Name
-        version     = $Version
-        method      = $Method
-        installedAt = (Get-Date -Format "o")
-        installedBy = $env:USERNAME
-        lastError   = ""
-        errorAt     = ""
+        name         = $Name
+        version      = $Version
+        status       = "installed"
+        method       = $Method
+        installedAt  = (Get-Date -Format "o")
+        lastChecked  = (Get-Date -Format "o")
+        installedBy  = $env:USERNAME
+        lastError    = ""
+        errorAt      = ""
     }
 
     $filePath = Join-Path $installedDir "$Name.json"
     $data | ConvertTo-Json -Depth 3 | Set-Content -Path $filePath -Encoding UTF8
 
-    Write-Log "Saved install record: .installed/$Name.json ($Version)" -Level "info"
+    Write-Log "Saved install record: .installed/$Name.json (status=installed, version=$Version)" -Level "info"
 }
 
 function Save-InstalledError {
