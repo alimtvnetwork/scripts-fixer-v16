@@ -476,6 +476,13 @@ function Save-LogFile {
     $endTime  = Get-Date
     $duration = ($endTime - $script:_LogStart).TotalSeconds
 
+    # Promote "ok" -> "already-installed" when the run was a verified no-op.
+    # We only promote on a clean success; any errors/warnings keep their status.
+    $isCleanOk = ($Status -eq "ok") -and ($script:_LogErrors.Count -eq 0)
+    if ($isCleanOk -and $script:_LogAlreadyInstalled) {
+        $Status = "already-installed"
+    }
+
     # Identity fields stamped into every log payload (v0.42.2+) AND into
     # every event entry (v0.43.1+). Reuse the cached value from
     # Initialize-Logging so we don't walk the call stack twice.
