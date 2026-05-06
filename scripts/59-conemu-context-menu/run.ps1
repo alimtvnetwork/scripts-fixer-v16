@@ -149,6 +149,12 @@ switch ($normalizedCommand) {
         return
     }
     { $_ -in @('uninstall','remove','rollback') } {
+        $confirmed = Confirm-DestructiveAction `
+            -Title  "Uninstall ConEmu context menu (registry rollback)" `
+            -Detail "Snapshots affected HKCR keys to a .reg file, then DELETES the right-click entries. Restore via '.\run.ps1 -I 59 restore'." `
+            -NonInteractive:$NonInteractive `
+            -AssumeYes:$AssumeYes
+        if (-not $confirmed) { Write-Log "Uninstall aborted by user." -Level "warn"; return }
         Uninstall-ConEmuContextMenu -Config $config -LogMessages $logMessages
         return
     }
@@ -157,6 +163,15 @@ switch ($normalizedCommand) {
         return
     }
     { $_ -in @('restore','restore-snapshot') } {
+        if (-not $DryRun) {
+            $snapLabel = if ([string]::IsNullOrWhiteSpace($SnapshotFile)) { '<newest snapshot>' } else { $SnapshotFile }
+            $confirmed = Confirm-DestructiveAction `
+                -Title  "Restore ConEmu context menu from .reg snapshot" `
+                -Detail ("Re-imports registry entries from: " + $snapLabel + ". This OVERWRITES current HKCR keys.") `
+                -NonInteractive:$NonInteractive `
+                -AssumeYes:$AssumeYes
+            if (-not $confirmed) { Write-Log "Restore aborted by user." -Level "warn"; return }
+        }
         $ok = Restore-ConEmuContextMenuSnapshot -SnapshotFile $SnapshotFile -DryRun:$DryRun -LogMessages $logMessages
         if (-not $ok) { exit 1 }
         return
