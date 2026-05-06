@@ -193,6 +193,23 @@ function Show-OsHelp {
     Write-Host "      Note: Windows 10/11 requires you to click 'Set default' in the Settings dialog." -ForegroundColor DarkGray
     Write-Host "            On Linux uses xdg-settings / xdg-mime; on macOS uses duti or System Settings." -ForegroundColor DarkGray
     Write-Host ""
+    Write-Host "  WINDOWS CONTEXT-MENU REPAIR (delegates to script 52)" -ForegroundColor Cyan
+    Write-Host "    fix-vscode-context-menu [flags]                        Repair 'Open with VS Code' folder right-click" -ForegroundColor Green
+    Write-Host "      (no flag)            Full repair + Explorer restart (default)" -ForegroundColor DarkGray
+    Write-Host "      --dry-run            Preview repair, no registry writes" -ForegroundColor DarkGray
+    Write-Host "      --verify             WhatIf + verbose registry trace (read-only)" -ForegroundColor DarkGray
+    Write-Host "      --verify-handlers    Standalone PASS/FAIL check of HKCR handlers" -ForegroundColor DarkGray
+    Write-Host "      --no-restart         Repair but skip explorer.exe restart" -ForegroundColor DarkGray
+    Write-Host "      --trace              Repair with VerboseRegistry trace" -ForegroundColor DarkGray
+    Write-Host "      --restore            Re-import the newest BEFORE .reg snapshot" -ForegroundColor DarkGray
+    Write-Host "      --rollback           Restore default installer entries on all targets" -ForegroundColor DarkGray
+    Write-Host "      --refresh            Lightweight Explorer/shell refresh only" -ForegroundColor DarkGray
+    Write-Host "      --edition stable|insiders   Target a specific VS Code edition" -ForegroundColor DarkGray
+    Write-Host "      --snapshot-dir <p>   Override snapshot folder" -ForegroundColor DarkGray
+    Write-Host "      --restore-from <p>   Explicit .reg snapshot for --restore" -ForegroundColor DarkGray
+    Write-Host "      --require-signature  Enforce Authenticode signer check" -ForegroundColor DarkGray
+    Write-Host "      --non-interactive    Suppress prompts (CI mode)" -ForegroundColor DarkGray
+    Write-Host ""
     Write-Host "  SSH KEY MANAGEMENT (cross-OS, idempotent)" -ForegroundColor Cyan
     Write-Host "    gen-key [--type ed25519|rsa] [--out PATH] [--ask] [--dry-run]" -ForegroundColor Green
     Write-Host "    install-key --key '...' | --key-file PATH [--user N] [--dry-run]" -ForegroundColor Green
@@ -470,6 +487,15 @@ switch ($normalizedAction) {
     }
     { $_ -in @("email", "mail", "default-email", "default-mail", "set-email", "mail-client") } {
         & (Join-Path $scriptDir "helpers\email.ps1") @Rest
+        exit $LASTEXITCODE
+    }
+    { $_ -in @(
+        "fix-vscode-context-menu", "fix-vscode-menu",
+        "vscode-context-menu", "vscode-folder-menu",
+        "fix-vscode-folder-menu", "vscode-menu-fix",
+        "repair-vscode-menu"
+    ) } {
+        & (Join-Path $scriptDir "helpers\fix-vscode-context-menu.ps1") @Rest
         exit $LASTEXITCODE
     }
     { $_ -in @("help", "--help", "-help", "-h", "/?", "?", "") } {

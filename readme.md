@@ -756,6 +756,8 @@ dispatcher: [`scripts/os/run.ps1`](scripts/os/run.ps1).
 | **Default apps (cross-OS)** | | | |
 | `os browser <name>` | Set default web browser. Win: opens `ms-settings:defaultapps` scoped to the app + verifies `UserChoice`; Linux: `xdg-settings`; macOS: `duti` (or System Settings fallback). Names: `chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `librewolf` (+ `chromium`/`safari` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
 | `os email <name>` | Set default mail (`mailto:`) client. Same cross-OS strategy. Names: `outlook`, `outlook-new`, `thunderbird`, `mailbird`, `em-client`, `windows-mail` (+ `evolution`/`geary`/`kmail`/`mailspring`/`apple-mail`/`outlook-mac`/`spark`/`airmail` on POSIX) | 👤 No | [Examples](#default-apps-browser--mail-client) |
+| **Windows context-menu repair** | | | |
+| `os fix-vscode-context-menu` | One-shot repair of the Windows folder right-click "Open with VS Code" entries. Thin wrapper that delegates to script 52 (`scripts/52-vscode-folder-repair/`): backs up `HKCR\Directory\shell\VSCode` + Background + Drive variants, rewrites entries, runs PASS/FAIL handler verification, and refreshes Explorer. Flags: `--dry-run`, `--verify`, `--verify-handlers`, `--no-restart`, `--trace`, `--restore`, `--rollback`, `--refresh`, `--edition stable\|insiders` | 🛡️ Yes | [Examples](#fix-vscode-context-menu-windows-folder-right-click) |
 | **macOS** | | | |
 | `os clean-vscode-mac` | macOS-only: surgical removal of VS Code Services, `code` CLI symlink, LaunchServices entries, login items, LaunchAgents | 👤 No | [Examples](#os-commands) |
 
@@ -923,6 +925,30 @@ non-interactive setting; without it the helper opens System Settings as a fallba
 .\run.ps1 os startup-add env --name DEV_DIR --value C:\dev-tool            # register env var
 .\run.ps1 os startup-list                        # list lovable-startup-* tagged entries
 .\run.ps1 os startup-remove notepad              # remove a tagged entry by name
+```
+
+#### Fix VS Code context menu (Windows folder right-click)
+
+`os fix-vscode-context-menu` is a one-liner that delegates to
+[`scripts/52-vscode-folder-repair/`](scripts/52-vscode-folder-repair/).
+It backs up the affected `HKCR` keys (with a `reg import` rollback hint),
+rewrites `Directory\shell\VSCode`, `Directory\Background\shell\VSCode` and
+the `Drive` variants, runs the PASS/FAIL handler verification table, and
+refreshes Explorer — so the "Open with VS Code" entry shows up again
+without rebooting. Requires elevation (writes to `HKEY_CLASSES_ROOT`).
+
+```powershell
+.\run.ps1 os fix-vscode-context-menu                    # full repair + Explorer restart (default)
+.\run.ps1 os fix-vscode-context-menu --dry-run          # preview, no registry writes
+.\run.ps1 os fix-vscode-context-menu --verify           # WhatIf + verbose registry trace
+.\run.ps1 os fix-vscode-context-menu --verify-handlers  # standalone PASS/FAIL handler check (read-only)
+.\run.ps1 os fix-vscode-context-menu --no-restart       # repair but skip explorer.exe restart
+.\run.ps1 os fix-vscode-context-menu --trace            # repair with VerboseRegistry trace
+.\run.ps1 os fix-vscode-context-menu --restore          # re-import the newest BEFORE .reg snapshot
+.\run.ps1 os fix-vscode-context-menu --rollback         # restore default installer entries on all targets
+.\run.ps1 os fix-vscode-context-menu --refresh          # lightweight Explorer/shell refresh only
+.\run.ps1 os fix-vscode-context-menu --edition insiders # target VS Code Insiders specifically
+.\run.ps1 os fix-vscode-context-menu --non-interactive  # CI mode: no prompts
 ```
 
 #### Help (all four show the same OS subcommand catalog)
