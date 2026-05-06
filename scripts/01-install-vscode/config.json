@@ -12,5 +12,6 @@
       "label": "VS Code (Insiders)"
     }
   },
-  "promptEdition": true
+  "promptEdition": false,
+  "defaultEdition": "stable"
 }
