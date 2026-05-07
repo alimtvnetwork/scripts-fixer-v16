@@ -25,7 +25,7 @@ foreach ($c in $candidates) {
     $isPresent = Test-Path -LiteralPath $c.Path
     if (-not $isPresent) { continue }
     try {
-        $studios = Get-ChildItem -LiteralPath $c.Path -Directory -Filter $c.Filter -Force -ErrorAction SilentlyContinue
+        $studios = @(Get-ChildItem -LiteralPath $c.Path -Directory -Filter $c.Filter -Force -ErrorAction SilentlyContinue)
     } catch {
         Write-Log "android-studio enumerate failed at $($c.Path): $($_.Exception.Message)" -Level "warn"
         continue
