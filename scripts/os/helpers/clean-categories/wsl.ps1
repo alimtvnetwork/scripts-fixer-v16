@@ -20,7 +20,7 @@ try {
     $raw = & wsl.exe --list --quiet 2>$null
     if ($LASTEXITCODE -eq 0 -and $raw) {
         # wsl.exe outputs UTF-16 with NULs; strip them
-        $distros = $raw | ForEach-Object { ($_ -replace "`0","").Trim() } | Where-Object { $_ -and $_ -notmatch "^Windows Subsystem" }
+        $distros = @($raw | ForEach-Object { ($_ -replace "`0","").Trim() } | Where-Object { $_ -and $_ -notmatch "^Windows Subsystem" })
     }
 } catch {
     Write-Log "wsl --list failed: $($_.Exception.Message)" -Level "warn"
