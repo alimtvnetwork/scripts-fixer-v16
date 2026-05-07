@@ -49,7 +49,7 @@ if ($hasCode) {
         $isGlob = $sub.Contains('*')
         if ($isGlob) {
             try {
-                $matches = Get-ChildItem -Path (Join-Path $codeAppData $sub) -Directory -Force -ErrorAction SilentlyContinue
+                $matches = @(Get-ChildItem -Path (Join-Path $codeAppData $sub) -Directory -Force -ErrorAction SilentlyContinue)
                 foreach ($m in $matches) {
                     Invoke-PathSweep -Path $m.FullName -Result $result -DryRun:$DryRun -LogPrefix "vscode/$($m.Name)"
                 }
