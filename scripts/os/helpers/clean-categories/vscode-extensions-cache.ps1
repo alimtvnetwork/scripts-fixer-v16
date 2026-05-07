@@ -25,7 +25,7 @@ if (-not $hasExt -and -not $hasCode) {
 # Per-extension cache/log subfolders (depth 1 only)
 if ($hasExt) {
     try {
-        $extFolders = Get-ChildItem -LiteralPath $extDir -Directory -Force -ErrorAction SilentlyContinue
+        $extFolders = @(Get-ChildItem -LiteralPath $extDir -Directory -Force -ErrorAction SilentlyContinue)
     } catch {
         Write-Log "vscode-extensions-cache enumerate failed at ${extDir}: $($_.Exception.Message)" -Level "warn"
         $extFolders = @()
@@ -49,7 +49,7 @@ if ($hasCode) {
         $isGlob = $sub.Contains('*')
         if ($isGlob) {
             try {
-                $matches = Get-ChildItem -Path (Join-Path $codeAppData $sub) -Directory -Force -ErrorAction SilentlyContinue
+                $matches = @(Get-ChildItem -Path (Join-Path $codeAppData $sub) -Directory -Force -ErrorAction SilentlyContinue)
                 foreach ($m in $matches) {
                     Invoke-PathSweep -Path $m.FullName -Result $result -DryRun:$DryRun -LogPrefix "vscode/$($m.Name)"
                 }

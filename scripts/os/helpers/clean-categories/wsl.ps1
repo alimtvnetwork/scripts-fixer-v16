@@ -20,7 +20,7 @@ try {
     $raw = & wsl.exe --list --quiet 2>$null
     if ($LASTEXITCODE -eq 0 -and $raw) {
         # wsl.exe outputs UTF-16 with NULs; strip them
-        $distros = $raw | ForEach-Object { ($_ -replace "`0","").Trim() } | Where-Object { $_ -and $_ -notmatch "^Windows Subsystem" }
+        $distros = @($raw | ForEach-Object { ($_ -replace "`0","").Trim() } | Where-Object { $_ -and $_ -notmatch "^Windows Subsystem" })
     }
 } catch {
     Write-Log "wsl --list failed: $($_.Exception.Message)" -Level "warn"
@@ -71,7 +71,7 @@ foreach ($d in $distros) {
     $script = if ($DryRun) { $dryScript } else { $cleanScript }
     try {
         $output = & wsl.exe -d $d -- bash -c $script 2>&1
-        $bytesLine = ($output | Where-Object { $_ -match "^BYTES=" }) | Select-Object -Last 1
+        $bytesLine = @($output | Where-Object { $_ -match "^BYTES=" }) | Select-Object -Last 1
         $b = 0
         if ($bytesLine -and ($bytesLine -match "^BYTES=(\d+)")) { $b = [long]$Matches[1] }
         if ($DryRun) {

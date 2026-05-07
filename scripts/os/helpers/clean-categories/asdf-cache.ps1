@@ -53,7 +53,7 @@ if ($null -ne $asdfCmd) {
                 # 'asdf current <plugin>' prints e.g. "nodejs          18.19.0     /home/u/.tool-versions"
                 $line = (& asdf current $p.Name 2>$null | Select-Object -First 1)
                 if (-not [string]::IsNullOrWhiteSpace($line)) {
-                    $cols = ($line -split '\s+') | Where-Object { $_ }
+                    $cols = @(($line -split '\s+') | Where-Object { $_ })
                     if ($cols.Count -ge 2) { $activeMap[$p.Name] = $cols[1].Trim() }
                 }
             } catch {

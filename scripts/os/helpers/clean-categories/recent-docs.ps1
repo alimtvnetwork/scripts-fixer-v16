@@ -14,7 +14,7 @@ if (-not (Test-Path -LiteralPath $recent)) {
 }
 
 # Only top-level *.lnk files -- subfolders (AutomaticDestinations, CustomDestinations) are jumplist's domain
-$files = Get-ChildItem -LiteralPath $recent -Force -File -ErrorAction SilentlyContinue
+$files = @(Get-ChildItem -LiteralPath $recent -Force -File -ErrorAction SilentlyContinue)
 foreach ($f in $files) {
     $sz = $f.Length
     if ($DryRun) { $result.WouldCount++; $result.WouldBytes += $sz; continue }

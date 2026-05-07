@@ -25,7 +25,7 @@ foreach ($c in $candidates) {
     $isPresent = Test-Path -LiteralPath $c.Path
     if (-not $isPresent) { continue }
     try {
-        $studios = Get-ChildItem -LiteralPath $c.Path -Directory -Filter $c.Filter -Force -ErrorAction SilentlyContinue
+        $studios = @(Get-ChildItem -LiteralPath $c.Path -Directory -Filter $c.Filter -Force -ErrorAction SilentlyContinue)
     } catch {
         Write-Log "android-studio enumerate failed at $($c.Path): $($_.Exception.Message)" -Level "warn"
         continue
@@ -51,7 +51,7 @@ if (Test-Path -LiteralPath $dotAndroid) {
     $avdRoot = Join-Path $dotAndroid "avd"
     if (Test-Path -LiteralPath $avdRoot) {
         try {
-            $avds = Get-ChildItem -LiteralPath $avdRoot -Directory -Filter "*.avd" -Force -ErrorAction SilentlyContinue
+            $avds = @(Get-ChildItem -LiteralPath $avdRoot -Directory -Filter "*.avd" -Force -ErrorAction SilentlyContinue)
         } catch {
             Write-Log "android-studio AVD enumerate failed at ${avdRoot}: $($_.Exception.Message)" -Level "warn"
             $avds = @()
