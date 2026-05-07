@@ -532,6 +532,14 @@ function Show-RootHelp {
     Write-Host "    $("install conemu+menu".PadRight($kc))" -NoNewline; Write-Host "Same as conemu-menu (alias) [48,59]" -ForegroundColor DarkGray
     Write-Host "    $("install conemu-context-menu".PadRight($kc))" -NoNewline; Write-Host "Same as conemu-menu (alias) [48,59]" -ForegroundColor DarkGray
     Write-Host ""
+    Write-Host "      Scripts Fixer cascading right-click menu (script 53):" -ForegroundColor DarkYellow
+    Write-Host "    $("install os-context-menu".PadRight($kc))" -NoNewline; Write-Host "Install full 'Scripts Fixer v{ver}' cascading right-click menu (file/folder/bg/desktop) [53]" -ForegroundColor DarkGray
+    Write-Host "    $("install context-menu-all".PadRight($kc))" -NoNewline; Write-Host "Same as os-context-menu (alias) [53]" -ForegroundColor DarkGray
+    Write-Host "    $("install all-context-menu".PadRight($kc))" -NoNewline; Write-Host "Same as os-context-menu (alias) [53]" -ForegroundColor DarkGray
+    Write-Host "    $("install os-install-context-menu".PadRight($kc))" -NoNewline; Write-Host "Same as os-context-menu (alias) [53]" -ForegroundColor DarkGray
+    Write-Host "    $("install scripts-fixer-menu".PadRight($kc))" -NoNewline; Write-Host "Same as os-context-menu (alias) [53]" -ForegroundColor DarkGray
+    Write-Host "    $("install sf-menu".PadRight($kc))" -NoNewline; Write-Host "Same as os-context-menu (short alias) [53]" -ForegroundColor DarkGray
+    Write-Host ""
     Write-Host "      Other apps with bundled settings:" -ForegroundColor DarkYellow
     Write-Host "    $("install npp+settings".PadRight($kc))" -NoNewline; Write-Host "Notepad++ + settings [33 install+settings]" -ForegroundColor DarkGray
     Write-Host "    $("install obs+settings".PadRight($kc))" -NoNewline; Write-Host "OBS Studio + settings [36 install+settings]" -ForegroundColor DarkGray
