@@ -71,7 +71,7 @@ foreach ($d in $distros) {
     $script = if ($DryRun) { $dryScript } else { $cleanScript }
     try {
         $output = & wsl.exe -d $d -- bash -c $script 2>&1
-        $bytesLine = ($output | Where-Object { $_ -match "^BYTES=" }) | Select-Object -Last 1
+        $bytesLine = @($output | Where-Object { $_ -match "^BYTES=" }) | Select-Object -Last 1
         $b = 0
         if ($bytesLine -and ($bytesLine -match "^BYTES=(\d+)")) { $b = [long]$Matches[1] }
         if ($DryRun) {
