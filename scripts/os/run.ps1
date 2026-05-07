@@ -489,7 +489,22 @@ switch ($normalizedAction) {
         exit $LASTEXITCODE
     }
     { $_ -in @("power", "power-settings", "display-sleep", "no-sleep") } {
-        & (Join-Path $scriptDir "helpers\power.ps1") @Rest
+        # Translate bare positional aliases (e.g. `os power never`) into the
+        # named switch power.ps1 expects, so users don't have to remember `--`.
+        # Without this, "never" would bind positionally to [int]$Display and
+        # throw "Cannot convert value 'never' to type System.Int32".
+        $powerArgs = @()
+        foreach ($a in $Rest) {
+            $low = "$a".Trim().ToLower()
+            switch ($low) {
+                "never"   { $powerArgs += "--never";  break }
+                "ac-only" { $powerArgs += "--ac-only"; break }
+                "dc-only" { $powerArgs += "--dc-only"; break }
+                "dry-run" { $powerArgs += "--dry-run"; break }
+                default   { $powerArgs += $a }
+            }
+        }
+        & (Join-Path $scriptDir "helpers\power.ps1") @powerArgs
         exit $LASTEXITCODE
     }
     { $_ -in @("browser", "default-browser", "set-browser", "web-browser") } {
