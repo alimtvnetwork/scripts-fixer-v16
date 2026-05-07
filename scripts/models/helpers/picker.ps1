@@ -27,7 +27,9 @@ function Get-BackendCatalog {
     $raw = Get-Content $catalogPath -Raw | ConvertFrom-Json
 
     # Drill into nested path if specified (e.g. ollama config has "defaultModels")
-    $items = if ($backendCfg.catalogPath) { $raw.($backendCfg.catalogPath) } else { $raw.models }
+    $catalogPathProp = $backendCfg.PSObject.Properties['catalogPath']
+    $catalogPathValue = if ($catalogPathProp) { $catalogPathProp.Value } else { $null }
+    $items = if ($catalogPathValue) { $raw.$catalogPathValue } else { $raw.models }
 
     $idField   = $backendCfg.idField
     $nameField = $backendCfg.displayField
