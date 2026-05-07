@@ -9,7 +9,7 @@ param([switch]$DryRun, [switch]$Yes, [int]$Days = 30, [hashtable]$SharedResult)
 $here = Split-Path -Parent $MyInvocation.MyCommand.Definition
 . (Join-Path $here "_sweep.ps1")
 
-$result = New-CleanResult -Category "wu-download" -Label "Windows Update download cache (\$WINDIR\SoftwareDistribution\Download)" -Bucket "A"
+$result = New-CleanResult -Category "wu-download" -Label 'Windows Update download cache ($WINDIR\SoftwareDistribution\Download)' -Bucket "A"
 
 # Resolve %WINDIR% from the environment, with a defensive fallback chain.
 # Use [Environment]::GetEnvironmentVariable rather than $env:WINDIR -- under
