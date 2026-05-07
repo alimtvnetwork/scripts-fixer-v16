@@ -6,10 +6,10 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 $result = New-CleanResult -Category "chkdsk" -Label "Chkdsk file fragments (C:\found.*)" -Bucket "A"
 
-$found = Get-ChildItem -Path "C:\" -Directory -Force -ErrorAction SilentlyContinue |
-         Where-Object { $_.Name -match '^found\.\d+$' }
+$found = @(Get-ChildItem -Path "C:\" -Directory -Force -ErrorAction SilentlyContinue |
+          Where-Object { $_.Name -match '^found\.\d+$' })
 
-if ($null -eq $found -or $found.Count -eq 0) {
+if ($found.Count -eq 0) {
     $result.Notes += "No found.* directories present (no chkdsk fragments)"
     Set-CleanResultStatus -Result $result -DryRun:$DryRun
     return $result
