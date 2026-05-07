@@ -21,8 +21,8 @@ foreach ($d in $drives) {
     $rb = Join-Path $d.Root '$Recycle.Bin'
     if (-not (Test-Path -LiteralPath $rb)) { continue }
     try {
-        $items = Get-ChildItem -LiteralPath $rb -Recurse -Force -ErrorAction SilentlyContinue |
-                 Where-Object { -not $_.PSIsContainer }
+        $items = @(Get-ChildItem -LiteralPath $rb -Recurse -Force -ErrorAction SilentlyContinue |
+                   Where-Object { -not $_.PSIsContainer })
         $bytes = ($items | Measure-Object -Property Length -Sum).Sum
         if ($null -eq $bytes) { $bytes = 0 }
         if ($DryRun) {
