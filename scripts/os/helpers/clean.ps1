@@ -220,15 +220,16 @@ $catalog = @(
 
 # ---------- Filter ----------
 $selected = $catalog
-if ($onlyList.Count -gt 0) {
+if (@($onlyList).Count -gt 0) {
     $selected = $catalog | Where-Object { $onlyList -contains $_.Cat }
 }
-if ($skipList.Count -gt 0) {
+if (@($skipList).Count -gt 0) {
     $selected = $selected | Where-Object { $skipList -notcontains $_.Cat }
 }
-if ($bucketList.Count -gt 0) {
+if (@($bucketList).Count -gt 0) {
     $selected = $selected | Where-Object { $bucketList -contains $_.Bucket }
 }
+$selected = @($selected)
 
 if ($selected.Count -eq 0) {
     Write-Host ""
