@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.215.0] -- 2026-05-07
+
+### Added: `install os-context-menu` / `install context-menu-all` keywords (script 53)
+
+Both forms (`install os-context-menu`, `install context-menu-all`, `install all-context-menu`, `install os-install-context-menu`, `install install-context-menu`, `install install-context-menu-all`, `install scripts-fixer-menu`, `install sf-menu`, `install fixer-menu`, `install universal-context-menu`) now route to script 53 and install the full cascading "Scripts Fixer v{ver}" right-click menu (file / folder / background / desktop scopes).
+
+The pre-existing `install context-menu` keyword (= VSCode menu fix, script 10) is unchanged to preserve backward compat. New help section "Scripts Fixer cascading right-click menu (script 53)" added under the install help.
+
 ## [v0.214.0] -- 2026-05-07
 
 ### Added: Universal context-menu spec + shared action catalog (P1+P2 of spec 55)
