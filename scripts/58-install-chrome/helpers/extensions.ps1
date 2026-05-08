@@ -52,6 +52,105 @@ function Resolve-ChromeExtensions {
     return $matched
 }
 
+function Expand-ChromeExtensionUrlInputs {
+    <#
+    .SYNOPSIS
+        Expands a list of raw input tokens into a flat list of extension URLs/IDs.
+        Any token that points at an existing local file (.csv / .txt / .tsv / no
+        ext) is opened and its contents are inlined: every non-empty, non-comment
+        cell is treated as a URL or bare extension id.
+
+        CSV/TSV: split on comma/semicolon/tab. A header row whose cells contain
+        no 32-char id and look like field names (url/id/extension/name/...) is
+        skipped. Lines starting with '#' or '//' are ignored.
+
+        Returns: @{ Tokens = @(...); Sources = @(@{ Path; Count }); Errors = @(...) }
+    #>
+    param([Parameter(Mandatory)] [string[]]$Inputs)
+
+    $tokens  = @()
+    $sources = @()
+    $errors  = @()
+    $idRx    = '[a-p]{32}'
+    $headerRx = '^(url|urls|link|links|id|ids|ext|extension|extensionid|name|slug)$'
+
+    foreach ($raw in $Inputs) {
+        if ([string]::IsNullOrWhiteSpace($raw)) { continue }
+        $t = $raw.Trim().Trim('"').Trim("'")
+
+        $looksLikePath = ($t -notmatch '^https?://') -and ($t -notmatch "^$idRx$") -and (
+            $t -match '[\\/]' -or $t -match '\.(csv|tsv|txt|list)$'
+        )
+
+        if ($looksLikePath) {
+            try {
+                $resolved = (Resolve-Path -LiteralPath $t -ErrorAction Stop).Path
+            } catch {
+                $errors += "Extension list file not found: '$t'  (resolved from input). Failure: $($_.Exception.Message)"
+                continue
+            }
+            if (-not (Test-Path -LiteralPath $resolved -PathType Leaf)) {
+                $errors += "Extension list path is not a file: '$resolved'"
+                continue
+            }
+
+            $lines = @()
+            try {
+                $lines = Get-Content -LiteralPath $resolved -ErrorAction Stop
+            } catch {
+                $errors += "Failed to read extension list file '$resolved': $($_.Exception.Message)"
+                continue
+            }
+
+            $fileTokens = @()
+            $rowIndex = -1
+            foreach ($line in $lines) {
+                $rowIndex++
+                if ($null -eq $line) { continue }
+                $stripped = $line.Trim()
+                if (-not $stripped) { continue }
+                if ($stripped.StartsWith('#') -or $stripped.StartsWith('//')) { continue }
+
+                $cells = $stripped -split '[,;\t]'
+                $rowHasId = $false
+                $rowAdds  = @()
+                foreach ($cell in $cells) {
+                    $c = $cell.Trim().Trim('"').Trim("'")
+                    if (-not $c) { continue }
+                    if ($c -match $idRx) { $rowHasId = $true }
+                    $rowAdds += $c
+                }
+
+                # Skip header row: first row, no id anywhere, every cell looks like a field name
+                if ($rowIndex -eq 0 -and -not $rowHasId) {
+                    $allHeaderish = $true
+                    foreach ($c in $rowAdds) {
+                        if ($c.ToLower() -notmatch $headerRx) { $allHeaderish = $false; break }
+                    }
+                    if ($allHeaderish) { continue }
+                }
+
+                $fileTokens += $rowAdds
+            }
+
+            $sources += [PSCustomObject]@{ Path = $resolved; Count = $fileTokens.Count }
+            $tokens  += $fileTokens
+        } else {
+            # Inline token -- still allow comma/space splitting to mirror old behavior
+            foreach ($piece in ($t -split '[,\s]+')) {
+                $p = $piece.Trim()
+                if ($p) { $tokens += $p }
+            }
+        }
+    }
+
+    return [PSCustomObject]@{
+        Tokens  = $tokens
+        Sources = $sources
+        Errors  = $errors
+    }
+}
+
 function Resolve-ChromeExtensionsFromUrls {
     <#
     .SYNOPSIS
