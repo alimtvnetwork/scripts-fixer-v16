@@ -296,6 +296,18 @@ function Invoke-Install {
             }
         }
 
+        # 2b. Universal Actions cascade (catalog A1..B5 -- spec 55, P3)
+        $catalogResult = Add-CatalogLeaves `
+            -TopKey         $topKey `
+            -ExplorerScope  $scopeName `
+            -ShellExe       $shellExe `
+            -RepoRoot       $RepoRoot `
+            -IconPath       $iconPath `
+            -MaxLen         $maxLen `
+            -LogMsgs        $LogMsgs
+        if (-not $catalogResult.Ok) { $isAllSuccessful = $false }
+        $totalLeaves += [int]$catalogResult.LeafCount
+
         # 3. Verify
         Write-Log ($LogMsgs.messages.verifyStart -replace '\{scope\}', $scopeName) -Level "info"
         $isTopOk = Test-MenuKeyExists -PsPath $topKey
