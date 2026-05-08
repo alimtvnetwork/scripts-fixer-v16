@@ -37,10 +37,15 @@ $logMessages = Import-JsonConfig (Join-Path $scriptDir "log-messages.json")
 # -- Help ---------------------------------------------------------------------
 if ($Help) {
     Show-ScriptHelp -LogMessages $logMessages
+    $paths = Get-ModelDownloadPaths -Config $config -ScriptsRoot $scriptsRoot
+    Show-ModelDownloadPaths -Paths $paths
     return
 }
 
 Write-Banner -Title $logMessages.scriptName
+
+# -- Resolve current model download locations (shown on every run) -----------
+$downloadPaths = Get-ModelDownloadPaths -Config $config -ScriptsRoot $scriptsRoot
 
 # -- Triple-path trio (Source / Temp / Target) -----------------------
 Write-InstallPaths `
@@ -48,7 +53,7 @@ Write-InstallPaths `
     -Action "Dispatch" `
     -Source "$scriptDir\config.json (model catalog)" `
     -Temp   ($env:TEMP + "\scripts-fixer\models") `
-    -Target ("varies per backend (Ollama / llama.cpp install dirs)")
+    -Target ("llama: {0} | ollama: {1}" -f $downloadPaths.Llama, $downloadPaths.Ollama)
 Initialize-Logging -ScriptName $logMessages.scriptName
 
 try {
