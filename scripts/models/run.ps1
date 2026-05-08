@@ -30,6 +30,7 @@ $scriptsRoot = Split-Path -Parent $scriptDir
 . (Join-Path $scriptDir "helpers\picker.ps1")
 . (Join-Path $scriptDir "helpers\ollama-search.ps1")
 . (Join-Path $scriptDir "helpers\uninstall.ps1")
+. (Join-Path $scriptDir "helpers\filters.ps1")
 
 # -- Load config & log messages ----------------------------------------------
 $config      = Import-JsonConfig (Join-Path $scriptDir "config.json")
@@ -163,18 +164,48 @@ try {
     }
 
     # ── List mode ────────────────────────────────────────────────────────
+    # Forms:
+    #   models list                       -- full catalog
+    #   models list llama | ollama        -- backend filter
+    #   models list <tag>                 -- capability/sort tag (coding, speed, voice, ...)
+    #   models list <tag1>,<tag2>,...     -- filter by tag1, then sort by tag2[,tag3...]
+    #   models list --tags | -tags | tags -- print every supported tag + alias
     if ($isListMode) {
-        $filter = if ($firstArg.ToLower() -eq "list") { $secondArg.ToLower() } else { "" }
+        $rawSecond = if ($firstArg.ToLower() -eq "list") { $secondArg } else { "" }
+        $secondLow = $rawSecond.ToLower()
+
+        if ($secondLow -in @("--tags","-tags","tags","help","--help")) {
+            Show-FilterTagsHelp
+            return
+        }
+
+        $isBackendFilter = $secondLow -in @("llama","llama-cpp","ollama")
+        $backendFilter   = if ($isBackendFilter) { $secondLow } else { "" }
+        $filterSpec      = if ($isBackendFilter -or -not $rawSecond) { "" } else { $rawSecond }
 
         $all = @()
-        if (-not $filter -or $filter -eq "llama" -or $filter -eq "llama-cpp") {
+        if (-not $backendFilter -or $backendFilter -eq "llama" -or $backendFilter -eq "llama-cpp") {
             $all += Get-BackendCatalog -Backend "llama-cpp" -Config $config -ScriptsRoot $scriptsRoot
         }
-        if (-not $filter -or $filter -eq "ollama") {
+        if (-not $backendFilter -or $backendFilter -eq "ollama") {
             $all += Get-BackendCatalog -Backend "ollama" -Config $config -ScriptsRoot $scriptsRoot
         }
-        $label = if ($filter) { $filter } else { "all backends" }
-        Show-ModelList -Models $all -BackendLabel $label -DownloadPaths $downloadPaths
+
+        $filterLabel = ""
+        if ($filterSpec) {
+            $unknown = @()
+            $tags = Resolve-FilterTags -Spec $filterSpec -UnknownOut ([ref]$unknown)
+            if ($unknown.Count -gt 0) {
+                Write-Log ("Unknown filter tag(s): {0}. Run 'models list --tags' to see supported tags." -f ($unknown -join ", ")) -Level "warn"
+            }
+            if ($tags.Count -gt 0) {
+                $all = Invoke-ModelFilter -Models $all -Tags $tags
+                $filterLabel = ($tags -join " > ")
+            }
+        }
+
+        $label = if ($backendFilter) { $backendFilter } else { "all backends" }
+        Show-ModelList -Models $all -BackendLabel $label -DownloadPaths $downloadPaths -FilterLabel $filterLabel
         return
     }
 
