@@ -70,6 +70,7 @@ $catalog = Get-Catalog -Path $catalogPath
 if ($null -eq $catalog) { exit 2 }
 
 $cmd = ($Action ?? "list").ToLower()
+try {
 switch ($cmd) {
     'list' {
         Write-Host ("  Catalog : " + $catalogPath) -ForegroundColor DarkGray
@@ -137,6 +138,8 @@ switch ($cmd) {
                     $rc52 = $LASTEXITCODE
                 } catch {
                     Write-Host ("  [ FAIL ] script 52 threw: " + $_.Exception.Message) -ForegroundColor Red
+                    Write-Host  "  [ STACK ]" -ForegroundColor DarkGray
+                    Write-Host ($_.ScriptStackTrace) -ForegroundColor DarkGray
                     $rc52 = 1
                 }
                 if ($rc52 -ne 0) { Write-Host "  [ WARN ] script 52 reported non-zero ($rc52). Continuing to script 53." -ForegroundColor Yellow }
@@ -186,4 +189,14 @@ switch ($cmd) {
         Write-Host "          Try: list | validate | install | uninstall | restore" -ForegroundColor Gray
         exit 64
     }
+}
+} catch {
+    Write-Host ""
+    Write-Host ("  [ FAIL ] Unhandled error: " + $_.Exception.Message) -ForegroundColor Red
+    Write-Host  "  [ STACK ]" -ForegroundColor DarkGray
+    if ($_.InvocationInfo -and $_.InvocationInfo.PositionMessage) {
+        Write-Host ($_.InvocationInfo.PositionMessage) -ForegroundColor DarkGray
+    }
+    Write-Host ($_.ScriptStackTrace) -ForegroundColor DarkGray
+    exit 1
 }
