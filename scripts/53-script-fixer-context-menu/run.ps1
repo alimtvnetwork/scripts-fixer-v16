@@ -33,6 +33,7 @@ $repoRoot  = Split-Path -Parent (Split-Path -Parent $scriptDir)
 . (Join-Path $scriptDir "helpers\categorize.ps1")
 . (Join-Path $scriptDir "helpers\shell-detect.ps1")
 . (Join-Path $scriptDir "helpers\menu-writer.ps1")
+. (Join-Path $scriptDir "helpers\catalog-leaves.ps1")
 
 # -- Load config & log messages -----------------------------------------------
 $config      = Import-JsonConfig (Join-Path $scriptDir "config.json")
