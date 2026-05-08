@@ -37,10 +37,15 @@ $logMessages = Import-JsonConfig (Join-Path $scriptDir "log-messages.json")
 # -- Help ---------------------------------------------------------------------
 if ($Help) {
     Show-ScriptHelp -LogMessages $logMessages
+    $paths = Get-ModelDownloadPaths -Config $config -ScriptsRoot $scriptsRoot
+    Show-ModelDownloadPaths -Paths $paths
     return
 }
 
 Write-Banner -Title $logMessages.scriptName
+
+# -- Resolve current model download locations (shown on every run) -----------
+$downloadPaths = Get-ModelDownloadPaths -Config $config -ScriptsRoot $scriptsRoot
 
 # -- Triple-path trio (Source / Temp / Target) -----------------------
 Write-InstallPaths `
@@ -48,7 +53,7 @@ Write-InstallPaths `
     -Action "Dispatch" `
     -Source "$scriptDir\config.json (model catalog)" `
     -Temp   ($env:TEMP + "\scripts-fixer\models") `
-    -Target ("varies per backend (Ollama / llama.cpp install dirs)")
+    -Target ("llama: {0} | ollama: {1}" -f $downloadPaths.Llama, $downloadPaths.Ollama)
 Initialize-Logging -ScriptName $logMessages.scriptName
 
 try {
@@ -57,11 +62,19 @@ try {
     $firstArg = if ($Args -and $Args.Count -gt 0) { $Args[0].Trim() } else { "" }
     $secondArg = if ($Args -and $Args.Count -gt 1) { $Args[1].Trim() } else { "" }
 
+    $isHelpMode      = $firstArg.ToLower() -in @("help", "--help", "-h", "/?")
+    if ($isHelpMode) {
+        Show-ScriptHelp -LogMessages $logMessages
+        Show-ModelDownloadPaths -Paths $downloadPaths
+        return
+    }
+
     $isListMode      = $List -or $firstArg.ToLower() -eq "list"
+    $isDownloadMode  = $firstArg.ToLower() -eq "download" -or $firstArg.ToLower() -eq "dl" -or $firstArg.ToLower() -eq "install"
     $isSearchMode    = $firstArg.ToLower() -eq "search"
     $isUninstallMode = $firstArg.ToLower() -eq "uninstall" -or $firstArg.ToLower() -eq "remove" -or $firstArg.ToLower() -eq "rm"
     $hasInstallParam = -not [string]::IsNullOrWhiteSpace($Install)
-    $reservedFirstArgs = @("list", "search", "uninstall", "remove", "rm")
+    $reservedFirstArgs = @("list", "search", "uninstall", "remove", "rm", "download", "dl", "install")
     $hasCsvFirstArg  = $firstArg -and ($reservedFirstArgs -notcontains $firstArg.ToLower()) -and $firstArg -match '[a-z0-9]'
 
     # ── List mode ────────────────────────────────────────────────────────
@@ -76,7 +89,39 @@ try {
             $all += Get-BackendCatalog -Backend "ollama" -Config $config -ScriptsRoot $scriptsRoot
         }
         $label = if ($filter) { $filter } else { "all backends" }
-        Show-ModelList -Models $all -BackendLabel $label
+        Show-ModelList -Models $all -BackendLabel $label -DownloadPaths $downloadPaths
+        return
+    }
+
+    # ── Download by index ─────────────────────────────────────────────────
+    # Usage: .\run.ps1 models download 5,6,10   (numbers from `models list`)
+    if ($isDownloadMode) {
+        $csv = if ($secondArg) { $secondArg } elseif ($hasInstallParam) { $Install } else { "" }
+        if ([string]::IsNullOrWhiteSpace($csv)) {
+            Write-Log "  Usage: .\run.ps1 models download <numbers-or-ids>  e.g. download 5,6,10  or  download qwen2.5-coder-3b" -Level "warn"
+            return
+        }
+
+        # Build the same combined catalog that `list` shows so numbers line up
+        $all = @()
+        $all += Get-BackendCatalog -Backend "llama-cpp" -Config $config -ScriptsRoot $scriptsRoot
+        $all += Get-BackendCatalog -Backend "ollama"    -Config $config -ScriptsRoot $scriptsRoot
+
+        $isNumeric = $csv -match '^[\d,\s\-]+$'
+        $matched = if ($isNumeric) {
+            Resolve-NumericPicks -Csv $csv -AllModels $all
+        } else {
+            Resolve-CsvIds -Csv $csv -AllModels $all -LogMessages $logMessages
+        }
+
+        if ($matched.Count -eq 0) {
+            Write-Log $logMessages.messages.csvNoneFound -Level "error"
+            return
+        }
+        Show-ModelDownloadPaths -Paths $downloadPaths
+        Invoke-BackendInstall -Models $matched -Config $config -ScriptsRoot $scriptsRoot -LogMessages $logMessages
+        Show-ModelDownloadPaths -Paths $downloadPaths
+        Write-Log $logMessages.messages.complete -Level "success"
         return
     }
 
@@ -209,35 +254,44 @@ try {
             Write-Log $logMessages.messages.csvNoneFound -Level "error"
             return
         }
+        Show-ModelDownloadPaths -Paths $downloadPaths
         Invoke-BackendInstall -Models $matched -Config $config -ScriptsRoot $scriptsRoot -LogMessages $logMessages
+        Show-ModelDownloadPaths -Paths $downloadPaths
         Write-Log $logMessages.messages.complete -Level "success"
         return
     }
 
-    # ── Interactive mode ─────────────────────────────────────────────────
-    $chosen = if ($Backend) { $Backend.ToLower() } else { Show-BackendPicker -LogMessages $logMessages }
-    if (-not $chosen) {
-        Write-Log $logMessages.messages.noBackendSelected -Level "warn"
+    # ── Default mode ─────────────────────────────────────────────────────
+    # `.\run.ps1 models` (no args) now prints the FULL catalog so users can
+    # browse first and then run `models download <numbers>` to install.
+    # Pass -Backend to scope to one backend; pass an id/CSV to install directly.
+    if ($Backend) {
+        $chosen = $Backend.ToLower()
+        if ($chosen -eq "both") {
+            $all  = @()
+            $all += Get-BackendCatalog -Backend "llama-cpp" -Config $config -ScriptsRoot $scriptsRoot
+            $all += Get-BackendCatalog -Backend "ollama"    -Config $config -ScriptsRoot $scriptsRoot
+            Show-ModelList -Models $all -BackendLabel "both" -DownloadPaths $downloadPaths
+            return
+        }
+        # Single backend: dispatch to its own interactive picker
+        $folder = $config.backends.$chosen.scriptFolder
+        $target = Join-Path (Join-Path $scriptsRoot $folder) "run.ps1"
+        $line = $logMessages.messages.dispatching -replace '\{backend\}', $chosen
+        Write-Log $line -Level "info"
+        & $target
+        Show-ModelDownloadPaths -Paths $downloadPaths
+        Write-Log $logMessages.messages.complete -Level "success"
         return
     }
 
-    if ($chosen -eq "both") {
-        $all  = @()
-        $all += Get-BackendCatalog -Backend "llama-cpp" -Config $config -ScriptsRoot $scriptsRoot
-        $all += Get-BackendCatalog -Backend "ollama"    -Config $config -ScriptsRoot $scriptsRoot
-        Show-ModelList -Models $all -BackendLabel "both"
-        Write-Host "  Tip: re-run with a CSV to install, e.g. .\run.ps1 models <id1>,<id2>" -ForegroundColor DarkGray
-        return
-    }
-
-    # Dispatch to the backend's own interactive picker (script 42 or 43)
-    $folder = $config.backends.$chosen.scriptFolder
-    $target = Join-Path (Join-Path $scriptsRoot $folder) "run.ps1"
-    $line = $logMessages.messages.dispatching -replace '\{backend\}', $chosen
-    Write-Log $line -Level "info"
-    & $target
-
-    Write-Log $logMessages.messages.complete -Level "success"
+    # No backend specified -- show the full combined catalog
+    $all  = @()
+    $all += Get-BackendCatalog -Backend "llama-cpp" -Config $config -ScriptsRoot $scriptsRoot
+    $all += Get-BackendCatalog -Backend "ollama"    -Config $config -ScriptsRoot $scriptsRoot
+    Show-ModelList -Models $all -BackendLabel "all backends" -DownloadPaths $downloadPaths
+    Write-Host "  Run  .\run.ps1 models help   to see every available command." -ForegroundColor DarkGray
+    Write-Host ""
 
 } catch {
     Write-Log "Unhandled error: $_" -Level "error"
