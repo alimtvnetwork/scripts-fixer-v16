@@ -90,18 +90,25 @@ try {
 
     # ── Install one or many extensions from raw Chrome Web Store URLs ───
     # Usage:
-    #   .\run.ps1 -I 58 ext-url     <url> [<url> ...]   # install N URLs
-    #   .\run.ps1 -I 58 ext-url-all <url1,url2,url3>     # explicit batch alias
+    #   .\run.ps1 -I 58 ext-url     <url> [<url> ...]            # install N URLs
+    #   .\run.ps1 -I 58 ext-url-all <url1,url2,url3>             # explicit batch alias
+    #   .\run.ps1 -I 58 ext-url     .\my-extensions.csv          # CSV file of URLs/IDs
+    #   .\run.ps1 -I 58 ext-url     list.csv https://...         # mix files + inline URLs
     if ($isExtUrlMode -or $isExtUrlAllMode) {
-        $urls = @()
-        foreach ($r in $Rest) {
-            foreach ($t in ($r -split '[,\s]+')) {
-                $tt = $t.Trim()
-                if ($tt) { $urls += $tt }
-            }
+        $expanded = Expand-ChromeExtensionUrlInputs -Inputs $Rest
+        foreach ($err in $expanded.Errors) {
+            Write-Log $err -Level "error"
         }
+        if ($expanded.Errors.Count -gt 0) {
+            Write-Log "One or more extension list files could not be loaded -- aborting install." -Level "error"
+            return
+        }
+        foreach ($src in $expanded.Sources) {
+            Write-Log ("Loaded {0} entr{1} from list file: {2}" -f $src.Count, $(if($src.Count -eq 1){'y'}else{'ies'}), $src.Path) -Level "info"
+        }
+        $urls = @($expanded.Tokens)
         if ($urls.Count -eq 0) {
-            Write-Log "No URLs provided. Usage: .\run.ps1 -I 58 ext-url <url> [<url> ...]" -Level "error"
+            Write-Log "No URLs provided. Usage: .\run.ps1 -I 58 ext-url <url|file.csv> [<url|file.csv> ...]" -Level "error"
             return
         }
 

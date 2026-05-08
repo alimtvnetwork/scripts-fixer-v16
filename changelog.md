@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.226.0] -- 2026-05-08
+
+### Added
+- **`ext-url` accepts CSV/list files** -- `.\run.ps1 -I 58 ext-url <path.csv>` (or `.txt`/`.tsv`/`.list`) now loads Chrome Web Store URLs **or** bare 32-char extension IDs from a local file. Inline URLs and file paths can be mixed in one call (`ext-url list.csv https://chromewebstore.google.com/detail/<slug>/<id>`).
+  - CSV/TSV cells split on `,` / `;` / tab. Header rows (`url`, `id`, `extension`, ...) are auto-skipped. Lines starting with `#` or `//` are treated as comments.
+  - New helper `Expand-ChromeExtensionUrlInputs` in **`scripts/58-install-chrome/helpers/extensions.ps1`** does the file expansion; the existing `Test-ChromeExtensionUrls` + warn/abort flow still runs against the expanded list, so duplicates and bad URLs from the file are caught before install.
+  - Per-CODE-RED rule, missing/unreadable list files log the **exact path** + failure reason and abort the install.
+
 ## [v0.225.0] -- 2026-05-08
 
 ### Added
