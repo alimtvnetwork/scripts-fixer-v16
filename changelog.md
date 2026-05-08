@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.222.0] -- 2026-05-08
+
+### Added
+- **Install Chrome extensions from raw Web Store URLs** (script 58). Two new subcommands:
+  - `.\run.ps1 -I 58 ext-url <url> [<url> ...]`  -- install one or many extensions by URL (also accepts `ext-url url1,url2,url3`).
+  - `.\run.ps1 -I 58 ext-url-all <url1,url2,url3>` -- explicit batch alias for installing every supplied URL at once.
+  - Same dispatcher works through the bare-install entry point: `.\run.ps1 install chrome ext-url <url> ...`.
+- New helper `Resolve-ChromeExtensionsFromUrls` parses both modern (`/detail/<slug>/<id>`) and legacy/bare (`/detail/<id>` or just the 32-char id) forms, de-dupes, and synthesizes catalog entries that flow through the existing **registry** (silent, requires admin) or **Web Store** (manual "Add to Chrome") install paths. Honors `-Method auto|registry|webstore`.
+
 ## [v0.221.0] -- 2026-05-08
 
 ### Added
