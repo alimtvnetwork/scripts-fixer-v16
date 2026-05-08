@@ -40,5 +40,37 @@
       ],
       "purgeAppData": false
     }
+  },
+  "extensions": {
+    "_comment": "Chrome blocks silent .crx installs from outside the Web Store. We support two install methods: (1) registry force-install (HKLM ExtensionInstallForcelist) -- silent, requires admin, auto-installs on next Chrome launch; (2) opening each Web Store URL so the user clicks 'Add to Chrome'.",
+    "defaultMethod": "auto",
+    "registryRoot": "HKLM:\\SOFTWARE\\Policies\\Google\\Chrome\\ExtensionInstallForcelist",
+    "updateUrl": "https://clients2.google.com/service/update2/crx",
+    "list": [
+      {
+        "name": "vpn",
+        "displayName": "Urban VPN Proxy",
+        "id": "eppiocemhmnlbhjplcgkofciiegomcon",
+        "url": "https://chromewebstore.google.com/detail/urban-vpn-proxy/eppiocemhmnlbhjplcgkofciiegomcon"
+      },
+      {
+        "name": "tabcopy",
+        "displayName": "TabCopy",
+        "id": "micdllihgoppmejpecmkilggmaagfdmb",
+        "url": "https://chromewebstore.google.com/detail/tab-copy/micdllihgoppmejpecmkilggmaagfdmb"
+      },
+      {
+        "name": "tabextend",
+        "displayName": "tabExtend - Easy Tab manager",
+        "id": "ffikidnnejmibopbgbelephlpigeniph",
+        "url": "https://chromewebstore.google.com/detail/tabextend-easy-tab-manage/ffikidnnejmibopbgbelephlpigeniph"
+      },
+      {
+        "name": "adblocker",
+        "displayName": "AdBlocker Stands",
+        "id": "lgblnfidahcdcjddiepkckcfdhpknnjh",
+        "url": "https://chromewebstore.google.com/detail/ad-blocker-stands-adblock/lgblnfidahcdcjddiepkckcfdhpknnjh"
+      }
+    ]
   }
 }

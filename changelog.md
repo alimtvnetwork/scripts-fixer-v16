@@ -2,6 +2,37 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.217.0] -- 2026-05-08
+
+### Added: shared `ai-models` directory + `models path` overrides + Chrome extension installer
+
+**Models orchestrator (`scripts/models/`)**
+- `Get-ModelDownloadPaths` now resolves `DEV_DIR` from `$env:DEV_DIR` AND the saved-path store (`Get-SavedDevPath`), so the dispatch banner no longer prints `<DEV_DIR not set>` when the user has run `.\run.ps1 path D:\dev` previously.
+- Default model subfolder is now **`ai-models`** (shared by both backends) instead of separate `llama-models` / `ollama-models`. `scripts/42-install-ollama/config.json` and `scripts/43-install-llama-cpp/config.json` updated accordingly.
+- New override resolution order per backend: `$env:LLAMA_MODELS_DIR` / `$env:OLLAMA_MODELS` -> saved per-backend override -> `$env:MODELS_DIR` -> saved shared override -> `<DEV_DIR>\ai-models`.
+- New subcommand `models path`:
+  - `models path` -- show resolved llama/ollama paths and the source of each.
+  - `models path <dir>` -- persist a SHARED model directory.
+  - `models path llama <dir>` / `models path ollama <dir>` -- per-backend override.
+  - `models path --reset [all|shared|llama|ollama]` -- clear persisted overrides.
+  - Persisted in `.resolved/models-paths.json`.
+- `Show-ModelDownloadPaths` now prints the source of each path (`env`, `saved:llama`, `DEV_DIR/ai-models`, ...) plus a full override-syntax cheat-sheet.
+
+**Chrome (`scripts/58-install-chrome/`)**
+- New `extensions` block in `config.json` with 4 catalog entries (`vpn`, `tabcopy`, `tabextend`, `adblocker`).
+- New helper `helpers/extensions.ps1` with `Install-ChromeExtensions` supporting two methods:
+  - `registry` -- writes `HKLM\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist`. Silent, requires admin, auto-installs on next Chrome launch.
+  - `webstore` -- launches each Web Store URL; user clicks "Add to Chrome".
+  - `auto` -- registry when elevated, webstore otherwise.
+- New subcommands on script 58 (also reachable via `.\run.ps1 install chrome <subcmd>`):
+  - `install chrome with-ext` -- install Chrome + all 4 extensions in one shot.
+  - `install chrome ext` -- show extension catalog.
+  - `install chrome ext vpn,adblocker` -- install named extensions (CSV or space-separated).
+  - `install chrome ext-all` -- install every catalog extension.
+  - `-Method registry|webstore|auto` flag controls install mechanism.
+
+
+
 ## [v0.216.0] -- 2026-05-08
 
 ### Added: Windows registry writes for catalog A1..B5 + `os context-menu` install/uninstall/restore (spec 55, P3 + P6)

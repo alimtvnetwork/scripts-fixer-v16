@@ -24,6 +24,7 @@ $scriptsRoot = Split-Path -Parent $scriptDir
 . (Join-Path $sharedDir "logging.ps1")
 . (Join-Path $sharedDir "help.ps1")
 . (Join-Path $sharedDir "install-paths.ps1")
+. (Join-Path $sharedDir "dev-dir.ps1")
 
 # -- Dot-source orchestrator helpers -----------------------------------------
 . (Join-Path $scriptDir "helpers\picker.ps1")
@@ -73,9 +74,49 @@ try {
     $isDownloadMode  = $firstArg.ToLower() -eq "download" -or $firstArg.ToLower() -eq "dl" -or $firstArg.ToLower() -eq "install"
     $isSearchMode    = $firstArg.ToLower() -eq "search"
     $isUninstallMode = $firstArg.ToLower() -eq "uninstall" -or $firstArg.ToLower() -eq "remove" -or $firstArg.ToLower() -eq "rm"
+    $isPathMode      = $firstArg.ToLower() -eq "path" -or $firstArg.ToLower() -eq "paths" -or $firstArg.ToLower() -eq "dir"
     $hasInstallParam = -not [string]::IsNullOrWhiteSpace($Install)
-    $reservedFirstArgs = @("list", "search", "uninstall", "remove", "rm", "download", "dl", "install")
+    $reservedFirstArgs = @("list", "search", "uninstall", "remove", "rm", "download", "dl", "install", "path", "paths", "dir", "help", "--help", "-h", "/?")
     $hasCsvFirstArg  = $firstArg -and ($reservedFirstArgs -notcontains $firstArg.ToLower()) -and $firstArg -match '[a-z0-9]'
+
+    # ── Path mode: show / set / reset model-dir overrides ────────────────
+    if ($isPathMode) {
+        $sub  = if ($secondArg) { $secondArg.ToLower() } else { "" }
+        $val  = if ($Args.Count -gt 2) { $Args[2].Trim() } else { "" }
+
+        # `models path`  -- show current resolution
+        if (-not $sub) {
+            Show-ModelDownloadPaths -Paths $downloadPaths
+            return
+        }
+
+        # `models path --reset [scope]`
+        if ($sub -in @("--reset", "-reset", "reset", "clear")) {
+            $resetScope = if ($val) { $val.ToLower() } else { "all" }
+            if ($resetScope -notin @("all","shared","llama","ollama")) {
+                Write-Log "Invalid reset scope '$resetScope'. Use: all | shared | llama | ollama" -Level "error"
+                return
+            }
+            Save-ModelsPathOverride -ScriptsRoot $scriptsRoot -Scope $resetScope -Path $null
+            Show-ModelDownloadPaths -Paths (Get-ModelDownloadPaths -Config $config -ScriptsRoot $scriptsRoot)
+            return
+        }
+
+        # `models path llama <dir>`  / `models path ollama <dir>`  / `models path <dir>` (shared)
+        if ($sub -in @("llama","llama-cpp","ollama")) {
+            if (-not $val) {
+                Write-Log "Usage: .\run.ps1 models path $sub <directory>" -Level "warn"
+                return
+            }
+            $scope = if ($sub -eq "ollama") { "ollama" } else { "llama" }
+            Save-ModelsPathOverride -ScriptsRoot $scriptsRoot -Scope $scope -Path $val
+        } else {
+            # treat $sub as a directory path -> shared scope
+            Save-ModelsPathOverride -ScriptsRoot $scriptsRoot -Scope "shared" -Path $secondArg
+        }
+        Show-ModelDownloadPaths -Paths (Get-ModelDownloadPaths -Config $config -ScriptsRoot $scriptsRoot)
+        return
+    }
 
     # ── List mode ────────────────────────────────────────────────────────
     if ($isListMode) {
