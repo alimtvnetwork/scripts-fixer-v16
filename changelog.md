@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.224.0] -- 2026-05-08
+
+### Added
+- **New script `60-install-protonvpn`** -- installs the Proton VPN Windows desktop client via Chocolatey (`choco install protonvpn`). Mirrors the script-58 (Chrome) pattern: triple-path install trio, `.installed/protonvpn.json` tracking with retry-on-prior-error, full `uninstallCleanup` block (registry keys, Start Menu / Desktop shortcuts, optional `appDataPaths` purge), optional official-installer fallback (disabled by default because Proton rotates filenames per release -- enable + set `fallback.url`/`fileName` in `config.json` to use it).
+- **Bare dispatcher wiring for ProtonVPN** (`run.ps1`):
+  - `.\run.ps1 install protonvpn` (also: `proton-vpn`, `proton`, `vpn`, `install-protonvpn`) -- routed via `scripts/shared/install-keywords.json`.
+  - `.\run.ps1 uninstall protonvpn` / `.\run.ps1 reinstall protonvpn` -- added to `$uninstallTargets` so the bare uninstall/reinstall verbs work the same way they do for Chrome.
+  - `.\run.ps1 -I 60` -- script-id route via `scripts/registry.json`.
+
+### Fixed
+- **Ollama model pulls were not tracked in `.installed/`**. After a successful `ollama pull <model>`, the pull loop now writes `.installed/model-<slug>.json` via the shared `Save-InstalledRecord` helper (method = `ollama-pull`, version = the pull tag). Failed pulls write the same record with `lastError` via `Save-InstalledError`. This matches the existing pattern used by llama.cpp model downloads and is what `scripts/models/helpers/uninstall.ps1` already scans (`.installed/model-*.json`), so `models list` / `models uninstall` now see Ollama-pulled models too.
+  - Pull failures also now surface a real exit code: the loop checks `$LASTEXITCODE` after `ollama pull` and throws on non-zero so the catch + error record actually run (previously a non-zero exit was swallowed).
+
+### Notes
+- **Where install state lives:** `.installed/<name>.json` at the project root, gitignored (see `.gitignore` -> `/.installed`). The folder is created on demand by `Get-InstalledDir` the first time any installer records state, which is why a fresh clone shows no folder until you run an install. Per-tool example: `.installed/protonvpn.json`, `.installed/googlechrome.json`, `.installed/model-qwen2.5-coder-3b.json`.
+
 ## [v0.223.0] -- 2026-05-08
 
 ### Added
