@@ -190,3 +190,13 @@ switch ($cmd) {
         exit 64
     }
 }
+} catch {
+    Write-Host ""
+    Write-Host ("  [ FAIL ] Unhandled error: " + $_.Exception.Message) -ForegroundColor Red
+    Write-Host  "  [ STACK ]" -ForegroundColor DarkGray
+    if ($_.InvocationInfo -and $_.InvocationInfo.PositionMessage) {
+        Write-Host ($_.InvocationInfo.PositionMessage) -ForegroundColor DarkGray
+    }
+    Write-Host ($_.ScriptStackTrace) -ForegroundColor DarkGray
+    exit 1
+}
