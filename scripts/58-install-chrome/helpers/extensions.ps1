@@ -168,10 +168,10 @@ function Test-ChromeExtensionUrls {
         # E2 -- host check (skip for bare ids)
         $isBareId = $clean -match "^$idPattern$"
         if (-not $isBareId -and $clean -match '^https?://([^/]+)') {
-            $host = $Matches[1].ToLower()
+            $urlHost = $Matches[1].ToLower()
             $isWebStore = $host -in @("chromewebstore.google.com","chrome.google.com")
             if (-not $isWebStore) {
-                $issues.Add([pscustomobject]@{ Severity='error'; Code='not-webstore'; Url=$u; Message="Host '$host' is not a Chrome Web Store domain" })
+                $issues.Add([pscustomobject]@{ Severity='error'; Code='not-webstore'; Url=$u; Message="Host '$urlHost' is not a Chrome Web Store domain" })
                 continue
             }
         }
