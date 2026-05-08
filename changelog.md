@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.221.0] -- 2026-05-08
+
+### Added
+- **Bare `uninstall` / `reinstall` dispatcher commands** (`run.ps1`): friendlier wrappers around script 58:
+  - `.\run.ps1 uninstall chrome`  (aliases: `remove chrome`, `rm chrome`) -- runs `scripts/58-install-chrome/run.ps1 uninstall` (Chocolatey-backed Google Chrome removal + tracking purge).
+  - `.\run.ps1 reinstall chrome`  (alias: `re-install chrome`) -- uninstall step then `install` step via the same script (re-pulls `googlechrome` from Chocolatey, falls back to the official standalone installer).
+  - Extra args after the target are forwarded to the underlying script (e.g. `reinstall chrome --with-ext`).
+  - Unknown targets print the supported list and a tip to use `.\run.ps1 -I <NN> uninstall` for other tools.
+
 ## [v0.220.0] -- 2026-05-08
 
 ### Added
