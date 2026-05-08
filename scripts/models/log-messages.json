@@ -23,18 +23,17 @@
       "-Help": "Show this help"
     },
     "examples": [
-      ".\\run.ps1 models",
-      ".\\run.ps1 model",
-      ".\\run.ps1 -M",
-      ".\\run.ps1 models qwen2.5-coder-3b,llama-3.1-8b-instruct",
-      ".\\run.ps1 models -Backend ollama -Install llama3.2,qwen2.5-coder",
-      ".\\run.ps1 models list",
+      ".\\run.ps1 models                          # show full catalog + download paths",
+      ".\\run.ps1 models help                     # show this help",
+      ".\\run.ps1 models list                     # rich table: size, RAM, ratings, best-for",
       ".\\run.ps1 models list llama",
-      ".\\run.ps1 models search llama",
-      ".\\run.ps1 models search phi3",
+      ".\\run.ps1 models download 5,6,10          # install by catalog number",
+      ".\\run.ps1 models download 5-8             # install a range",
+      ".\\run.ps1 models qwen2.5-coder-3b,llama3.2  # install by id",
+      ".\\run.ps1 models -Backend ollama -Install llama3.2,qwen2.5-coder",
+      ".\\run.ps1 models search phi3              # live Ollama Hub search",
       ".\\run.ps1 models uninstall",
       ".\\run.ps1 models uninstall ollama",
-      ".\\run.ps1 models rm",
       ".\\run.ps1 models uninstall -Force"
     ]
   },
