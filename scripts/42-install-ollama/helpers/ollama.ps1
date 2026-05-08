@@ -187,11 +187,23 @@ function Pull-OllamaModels {
         }
 
         Write-Log ($LogMessages.messages.modelPulling -replace '\{name\}', $model.displayName -replace '\{size\}', $model.sizeHint) -Level "info"
+        $trackingName = "model-$($model.slug)"
+        $pullTag      = if ($model.pullCommand) { [string]$model.pullCommand } else { [string]$model.slug }
         try {
             & ollama pull $model.pullCommand 2>&1
+            $exit = $LASTEXITCODE
+            if ($exit -ne 0) { throw "ollama pull exited with code $exit" }
             Write-Log ($LogMessages.messages.modelPullSuccess -replace '\{name\}', $model.displayName) -Level "success"
+            # Persist to .installed/<trackingName>.json so `models list` /
+            # uninstall.ps1 (which scans .installed/model-*.json) can see it.
+            if (Get-Command Save-InstalledRecord -ErrorAction SilentlyContinue) {
+                Save-InstalledRecord -Name $trackingName -Version $pullTag -Method "ollama-pull"
+            }
         } catch {
             Write-Log ($LogMessages.messages.modelPullFailed -replace '\{name\}', $model.displayName -replace '\{error\}', $_) -Level "error"
+            if (Get-Command Save-InstalledError -ErrorAction SilentlyContinue) {
+                Save-InstalledError -Name $trackingName -ErrorMessage "ollama pull '$pullTag' failed: $_" -Version $pullTag -Method "ollama-pull"
+            }
         }
     }
 }
