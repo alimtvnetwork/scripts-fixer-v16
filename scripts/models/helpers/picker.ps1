@@ -2,6 +2,61 @@
 #  Models orchestrator -- backend picker, catalog loading, CSV resolution
 # --------------------------------------------------------------------------
 
+function Get-ModelDownloadPaths {
+    <#
+    .SYNOPSIS
+        Returns the on-disk folders where each backend stores model weights.
+        Honors $env:DEV_DIR when set; otherwise reports the configured subfolder
+        and a hint about how to set the dev directory.
+    #>
+    param(
+        [Parameter(Mandatory)] [PSObject]$Config,
+        [Parameter(Mandatory)] [string]$ScriptsRoot
+    )
+
+    $devDir = $env:DEV_DIR
+    $hasDevDir = -not [string]::IsNullOrWhiteSpace($devDir)
+
+    # Resolve sub-folder names from the per-backend config files
+    $llamaSub  = "llama-models"
+    $ollamaSub = "ollama-models"
+    try {
+        $llamaCfg = Get-Content (Join-Path $ScriptsRoot "43-install-llama-cpp\config.json") -Raw | ConvertFrom-Json
+        if ($llamaCfg.modelsConfig.devDirSubfolder) { $llamaSub = $llamaCfg.modelsConfig.devDirSubfolder }
+    } catch {}
+    try {
+        $ollamaCfg = Get-Content (Join-Path $ScriptsRoot "42-install-ollama\config.json") -Raw | ConvertFrom-Json
+        if ($ollamaCfg.models.devDirSubfolder) { $ollamaSub = $ollamaCfg.models.devDirSubfolder }
+    } catch {}
+
+    $llamaPath  = if ($hasDevDir) { Join-Path $devDir $llamaSub }  else { "<DEV_DIR not set>\$llamaSub" }
+    $ollamaPath = if ($hasDevDir) { Join-Path $devDir $ollamaSub } else { "<DEV_DIR not set>\$ollamaSub  (Ollama also honors `$env:OLLAMA_MODELS)" }
+
+    return [PSCustomObject]@{
+        DevDir     = if ($hasDevDir) { $devDir } else { "(not set)" }
+        Llama      = $llamaPath
+        Ollama     = $ollamaPath
+        IsResolved = $hasDevDir
+    }
+}
+
+function Show-ModelDownloadPaths {
+    param(
+        [Parameter(Mandatory)] [PSObject]$Paths
+    )
+    Write-Host ""
+    Write-Host "  Model download locations" -ForegroundColor Yellow
+    Write-Host ("    DEV_DIR             : {0}" -f $Paths.DevDir)        -ForegroundColor Gray
+    Write-Host ("    llama.cpp (GGUF)    : {0}" -f $Paths.Llama)         -ForegroundColor White
+    Write-Host ("    Ollama daemon store : {0}" -f $Paths.Ollama)        -ForegroundColor Cyan
+    if (-not $Paths.IsResolved) {
+        Write-Host "    Tip: set the dev dir with  `$env:DEV_DIR='D:\dev'  or  .\run.ps1 path D:\dev" -ForegroundColor DarkGray
+    } else {
+        Write-Host "    Change with: `$env:DEV_DIR='X:\new-dev'  (Ollama: `$env:OLLAMA_MODELS='X:\ollama-models')" -ForegroundColor DarkGray
+    }
+    Write-Host ""
+}
+
 function Get-BackendCatalog {
     <#
     .SYNOPSIS
