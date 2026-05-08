@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.225.0] -- 2026-05-08
+
+### Added
+- **`models list <tag>` filter + sort syntax** -- the orchestrator now accepts capability and sort tags as the second positional argument:
+  - Single tag = filter: `models list coding`, `models list voice`, `models list reasoning`.
+  - CSV = filter by first tag, then sort by the rest in priority order: `models list coding,speed` (coding models, fastest first), `models list code,speed,small` (coding, fast, then smallest), `models list reasoning,best`.
+  - Quality/size tag alone = sort the full catalog: `models list speed`, `models list small`.
+  - `models list --tags` prints every supported tag and its aliases.
+  - All logic lives in a new small module **`scripts/models/helpers/filters.ps1`** (`Get-ModelTagSet`, `Resolve-FilterTags`, `Invoke-ModelFilter`, `Show-FilterTagsHelp`) so `picker.ps1` stays focused on rendering.
+  - Tag aliases supported: `code|dev|programming -> coding`, `reason|think|logic -> reasoning`, `write|prose|creative -> writing`, `speech|audio|transcribe -> voice`, `multi|translate -> multilingual`, `assistant|conversation -> chat`, `fast|quick -> speed`, `top|quality|overall -> best`, `tiny|light -> small`, `big|heavy -> large`. Tags are also inferred from `purpose` for catalog entries that don't carry the full `is*` flags (Ollama defaults).
+- **New catalog entries** (llama.cpp + Ollama):
+  - **Google Gemma 3** -- `gemma-3-12b-it`, `gemma-3-27b-it` (llama.cpp); `gemma3:4b`, `gemma3:12b`, `gemma3:27b` (Ollama).
+  - **Qwen 3.7 Coder** -- `qwen3.7-coder-7b`, `qwen3.7-coder-14b` (llama.cpp); `qwen3.7-coder:7b`, `qwen3.7-coder:14b` (Ollama).
+  - **Microsoft Phi-4 (latest)** -- `phi-4-mini-reasoning` (llama.cpp); `phi4`, `phi4-mini-reasoning` (Ollama). The existing `phi-4-14b` and `phi-4-reasoning-plus` entries are preserved.
+  - New llama.cpp entries ship with empty `sha256` + a `manualReason`. Run `.\run.ps1 -I 43 fill-sha256 -- -Ids <id>` to auto-populate, or set `download.requireChecksum = false` (current default) to download unchecked.
+
+### Changed
+- **`Show-ModelList` rewritten as a line-by-line layout** -- every field (Family/Params/Quant, Size, RAM, Caps, per-axis ratings, Best for, Notes, License) is now printed on its own line with indentation. Long `bestFor` / `notes` text no longer wraps and breaks the table on narrow consoles. Header now also shows the active filter chain, e.g. `Available models (all backends | filter: coding > speed): 27`.
+- Help screen updated with the new `list <tag>` / `list <tag1>,<tag2>` / `list --tags` examples.
+
 ## [v0.224.0] -- 2026-05-08
 
 ### Added

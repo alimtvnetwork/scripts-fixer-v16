@@ -429,18 +429,20 @@ function _GetRawProp {
 function Show-ModelList {
     <#
     .SYNOPSIS
-        Prints a rich, color-highlighted catalog table with index numbers,
-        size, RAM, capability flags, and 1-10 ratings. The printed index
-        can be passed back as: .\run.ps1 models download 5,6,10
+        Prints a rich, line-by-line catalog so long descriptions never
+        wrap awkwardly across columns. The printed index can be passed
+        back as: .\run.ps1 models download 5,6,10
     #>
     param(
         [Parameter(Mandatory)] [array]$Models,
         [string]$BackendLabel = "all backends",
-        [PSObject]$DownloadPaths
+        [PSObject]$DownloadPaths,
+        [string]$FilterLabel = ""
     )
 
     Write-Host ""
-    Write-Host ("  Available models ({0}): {1}" -f $BackendLabel, $Models.Count) -ForegroundColor Yellow
+    $headerLabel = if ($FilterLabel) { "{0} | filter: {1}" -f $BackendLabel, $FilterLabel } else { $BackendLabel }
+    Write-Host ("  Available models ({0}): {1}" -f $headerLabel, $Models.Count) -ForegroundColor Yellow
     Write-Host "  Caps legend: [C]oding [R]easoning [W]riting [V]oice [M]ultilingual    Ratings 1-10 (Code / Reason / Speed)" -ForegroundColor DarkGray
     Write-Host "  * = recommended for coding" -ForegroundColor DarkGray
     Write-Host ""
@@ -473,28 +475,55 @@ function Show-ModelList {
         $rCode   = _GetRawProp $rating 'coding'    '-'
         $rReason = _GetRawProp $rating 'reasoning' '-'
         $rSpeed  = _GetRawProp $rating 'speed'     '-'
-        $ratingStr = "{0}/{1}/{2}" -f $rCode, $rReason, $rSpeed
+        $rOver   = _GetRawProp $rating 'overall'   '-'
 
         $purposeRaw = _GetRawProp $raw 'bestFor'
         if (-not $purposeRaw) { $purposeRaw = _GetRawProp $raw 'purpose' '' }
         $purpose = "$purposeRaw"
+
+        $family   = "$(_GetRawProp $raw 'family' '')"
+        $params   = "$(_GetRawProp $raw 'parameters' '')"
+        $quant    = "$(_GetRawProp $raw 'quantization' '')"
+        $license  = "$(_GetRawProp $raw 'license' '')"
+        $notes    = "$(_GetRawProp $raw 'notes' '')"
 
         $marker     = if ($isCoding) { "*" } else { " " }
         $headColor  = if ($isCoding) { "Yellow" } else { "White" }
         $bodyColor  = "White"
         $dimColor   = "DarkGray"
 
-        # Header line: "  12 * model-id-here"
+        # One-field-per-line layout so long text never breaks the table
         Write-Host ""
         Write-Host ("  {0,3} {1} {2}" -f $idx, $marker, $m.id) -ForegroundColor $headColor
-        Write-Host ("        Size  : {0}     RAM : {1}     Caps: {2}     Score (C/R/S): {3}" -f $sizeStr, $ramStr, $caps, $ratingStr) -ForegroundColor $bodyColor
+        $detailParts = @()
+        if ($family)  { $detailParts += $family }
+        if ($params)  { $detailParts += $params }
+        if ($quant)   { $detailParts += $quant }
+        $detailParts += ("backend: {0}" -f $m.backend)
+        Write-Host ("        {0}" -f ($detailParts -join " | ")) -ForegroundColor $dimColor
+        Write-Host ("        Size       : {0}" -f $sizeStr) -ForegroundColor $bodyColor
+        Write-Host ("        RAM needed : {0}" -f $ramStr)  -ForegroundColor $bodyColor
+        Write-Host ("        Caps       : {0}" -f $caps)    -ForegroundColor $bodyColor
+        Write-Host ("        Coding     : {0}/10" -f $rCode)   -ForegroundColor $bodyColor
+        Write-Host ("        Reasoning  : {0}/10" -f $rReason) -ForegroundColor $bodyColor
+        Write-Host ("        Speed      : {0}/10" -f $rSpeed)  -ForegroundColor $bodyColor
+        Write-Host ("        Overall    : {0}/10" -f $rOver)   -ForegroundColor $bodyColor
         if ($purpose) {
-            Write-Host ("        Best  : {0}" -f $purpose) -ForegroundColor $bodyColor
+            Write-Host  "        Best for   :" -ForegroundColor $bodyColor
+            Write-Host ("          {0}" -f $purpose) -ForegroundColor $bodyColor
+        }
+        if ($notes) {
+            Write-Host  "        Notes      :" -ForegroundColor $dimColor
+            Write-Host ("          {0}" -f $notes) -ForegroundColor $dimColor
+        }
+        if ($license) {
+            Write-Host ("        License    : {0}" -f $license) -ForegroundColor $dimColor
         }
     }
     Write-Host ""
     Write-Host "  Install by number : .\run.ps1 models download 5,6,10" -ForegroundColor DarkGray
     Write-Host "  Install by id     : .\run.ps1 models download qwen2.5-coder-3b,llama3.2" -ForegroundColor DarkGray
+    Write-Host "  Filter / order    : .\run.ps1 models list coding   |   models list coding,speed   |   models list --tags" -ForegroundColor DarkGray
 
     if ($DownloadPaths) { Show-ModelDownloadPaths -Paths $DownloadPaths }
 }
