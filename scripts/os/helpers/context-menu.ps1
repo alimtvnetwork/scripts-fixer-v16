@@ -178,6 +178,19 @@ switch ($cmd) {
             }
         }
     }
+    { $_ -in 'verify-vscode','validate-vscode','check-vscode','vscode' } {
+        $validator = Join-Path $sharedDir "vscode-context-menu-validate.ps1"
+        if (-not (Test-Path -LiteralPath $validator)) {
+            Write-Host ""
+            Write-Host "  [ FAIL ] Validator helper missing." -ForegroundColor Red
+            Write-Host ("          Path   : " + $validator) -ForegroundColor Gray
+            Write-Host  "          Reason : file does not exist on disk" -ForegroundColor Gray
+            exit 2
+        }
+        . $validator
+        $r = Test-VsCodeContextMenu -PrintTable $true
+        if ($r.IsAllOk) { exit 0 } else { exit 1 }
+    }
     'list-snapshots' {
         Write-Host ""
         Write-Host "  [ INFO ] 'list-snapshots' is not implemented yet." -ForegroundColor Yellow
@@ -186,7 +199,7 @@ switch ($cmd) {
     }
     default {
         Write-Host "  [ FAIL ] Unknown subcommand: $cmd" -ForegroundColor Red
-        Write-Host "          Try: list | validate | install | uninstall | restore" -ForegroundColor Gray
+        Write-Host "          Try: list | validate | verify-vscode | install | uninstall | restore" -ForegroundColor Gray
         exit 64
     }
 }
