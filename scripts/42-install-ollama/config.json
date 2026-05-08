@@ -35,6 +35,55 @@
       "pullCommand": "deepseek-r1:8b",
       "sizeHint": "~4.9 GB",
       "purpose": "reasoning"
+    },
+    {
+      "slug": "gemma3:4b",
+      "displayName": "Google Gemma 3 (4B)",
+      "pullCommand": "gemma3:4b",
+      "sizeHint": "~3.3 GB",
+      "purpose": "general"
+    },
+    {
+      "slug": "gemma3:12b",
+      "displayName": "Google Gemma 3 (12B)",
+      "pullCommand": "gemma3:12b",
+      "sizeHint": "~8.1 GB",
+      "purpose": "general"
+    },
+    {
+      "slug": "gemma3:27b",
+      "displayName": "Google Gemma 3 (27B)",
+      "pullCommand": "gemma3:27b",
+      "sizeHint": "~17 GB",
+      "purpose": "writing"
+    },
+    {
+      "slug": "qwen3.7-coder:7b",
+      "displayName": "Qwen 3.7 Coder (7B)",
+      "pullCommand": "qwen3.7-coder:7b",
+      "sizeHint": "~4.4 GB",
+      "purpose": "coding"
+    },
+    {
+      "slug": "qwen3.7-coder:14b",
+      "displayName": "Qwen 3.7 Coder (14B)",
+      "pullCommand": "qwen3.7-coder:14b",
+      "sizeHint": "~8.4 GB",
+      "purpose": "coding"
+    },
+    {
+      "slug": "phi4",
+      "displayName": "Microsoft Phi-4 (14B)",
+      "pullCommand": "phi4",
+      "sizeHint": "~9.1 GB",
+      "purpose": "reasoning"
+    },
+    {
+      "slug": "phi4-mini-reasoning",
+      "displayName": "Microsoft Phi-4 Mini Reasoning (3.8B)",
+      "pullCommand": "phi4-mini-reasoning",
+      "sizeHint": "~2.5 GB",
+      "purpose": "reasoning"
     }
   ]
 }
