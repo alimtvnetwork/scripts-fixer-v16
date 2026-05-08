@@ -52,6 +52,66 @@ function Resolve-ChromeExtensions {
     return $matched
 }
 
+function Resolve-ChromeExtensionsFromUrls {
+    <#
+    .SYNOPSIS
+        Parses one or many Chrome Web Store URLs and returns synthetic catalog
+        entries (name/displayName/id/url) suitable for the registry/web-store
+        installers. Accepts either:
+          * .../detail/<slug>/<id>           (modern URL)
+          * .../detail/<id>                  (id-only URL)
+          * a bare 32-char extension id      (no URL)
+        Invalid entries are logged and skipped. Duplicates (by id) are de-duped.
+    #>
+    param([Parameter(Mandatory)] [string[]]$Urls)
+
+    $idPattern = '([a-p]{32})'
+    $seen = @{}
+    $result = @()
+
+    foreach ($raw in $Urls) {
+        if ([string]::IsNullOrWhiteSpace($raw)) { continue }
+        $u = $raw.Trim().Trim('"').Trim("'")
+
+        # Strip query/fragment
+        $clean = ($u -split '[?#]')[0].TrimEnd('/')
+
+        $id = $null
+        $slug = $null
+
+        if ($clean -match "/detail/([^/]+)/$idPattern$") {
+            $slug = $Matches[1]
+            $id   = $Matches[2]
+        } elseif ($clean -match "/detail/$idPattern$") {
+            $id = $Matches[1]
+        } elseif ($clean -match "^$idPattern$") {
+            $id = $Matches[1]
+        }
+
+        if (-not $id) {
+            Write-Log "Could not extract Chrome extension id from URL: '$raw'  (expected .../detail/<slug>/<32-char-id> or a bare id)" -Level "warn"
+            continue
+        }
+
+        if ($seen.ContainsKey($id)) {
+            Write-Log "Duplicate extension id skipped: $id" -Level "info"
+            continue
+        }
+        $seen[$id] = $true
+
+        $name = if ($slug) { ($slug -replace '[^a-z0-9]+','-').Trim('-').ToLower() } else { $id.Substring(0,8) }
+        $display = if ($slug) { (Get-Culture).TextInfo.ToTitleCase(($slug -replace '-',' ').ToLower()) } else { "Chrome extension $id" }
+        $canonicalUrl = "https://chromewebstore.google.com/detail/$id"
+
+        $result += [PSCustomObject]@{
+            name        = $name
+            displayName = $display
+            id          = $id
+            url         = $canonicalUrl
+        }
+    }
+    return $result
+
 function Show-ChromeExtensionCatalog {
     param([Parameter(Mandatory)] [PSObject]$ExtConfig)
     Write-Host ""
