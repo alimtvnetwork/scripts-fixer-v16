@@ -108,6 +108,18 @@ function Get-ModelTagSet {
     if ([bool](_GetProp $Raw 'isMultilingual' $false)) { $tags['multilingual'] = $true }
     if ([bool](_GetProp $Raw 'isChat'         $false)) { $tags['chat']         = $true }
 
+    # Fallback: infer capability from `purpose` field (used by the lighter
+    # Ollama defaults config, which does not carry the full is* flags).
+    $purpose = "$(_GetProp $Raw 'purpose' '')".ToLower()
+    if ($purpose) {
+        if ($purpose -match 'cod')                       { $tags['coding']       = $true }
+        if ($purpose -match 'reason|think|logic')        { $tags['reasoning']    = $true }
+        if ($purpose -match 'writ|prose|creative')       { $tags['writing']      = $true }
+        if ($purpose -match 'voice|speech|audio')        { $tags['voice']        = $true }
+        if ($purpose -match 'translat|multilingual')     { $tags['multilingual'] = $true }
+        if ($purpose -match 'chat|assistant|general')    { $tags['chat']         = $true }
+    }
+
     # Size buckets derived from fileSizeGB / sizeHint.
     # small  : <= 3 GB    large : >= 12 GB
     $sizeGB = [double](_GetProp $Raw 'fileSizeGB' 0)
