@@ -3,9 +3,11 @@
   "description": "Pick a model backend (llama.cpp or Ollama), then browse, filter, and install AI models. Supports CSV direct install, interactive picker, live Ollama Hub search, and uninstall.",
   "help": {
     "commands": {
-      "(no args)": "Interactive: pick backend, then open the backend's picker",
-      "<csv>": "Direct install: comma-separated model ids (e.g. qwen2.5-coder-3b,llama3.2)",
-      "list": "Show all known models (both backends) with ids",
+      "(no args)": "Show the FULL combined catalog (llama.cpp + Ollama) with size, RAM, capabilities, ratings, and download paths",
+      "help": "Show this help screen plus current model download locations",
+      "<csv-ids>": "Direct install by id, e.g. qwen2.5-coder-3b,llama3.2",
+      "download <n,m,k>": "Install by catalog NUMBER (as printed by 'models list'), e.g. download 5,6,10  (also supports ranges: 5-8)",
+      "list": "Show full catalog (both backends) with rich columns: size, RAM, [C]oding/[R]easoning/[W]riting/[V]oice/[M]ultilingual flags, and 1-10 ratings",
       "list llama": "Show only llama.cpp catalog",
       "list ollama": "Show only Ollama defaults",
       "search <query>": "Search Ollama Hub (ollama.com/library) live and pick models to pull",
